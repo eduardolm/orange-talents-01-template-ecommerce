@@ -1,7 +1,6 @@
 package br.com.zup.mercadolivre.controller.request;
 
-import br.com.zup.mercadolivre.config.security.CryptoConverter;
-import br.com.zup.mercadolivre.config.security.CryptoConverterInterface;
+import br.com.zup.mercadolivre.config.security.CryptoProperties;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.validator.UniqueValue;
 
@@ -20,7 +19,7 @@ public class UserRequestDto {
     @Size(min = 6, max = 50, message = "A senha deve conter entre 6 e 50 caracteres.")
     private String password;
 
-    public User toModel(CryptoConverter crypto) {
+    public User toModel(CryptoProperties crypto) {
         return new User(email, crypto.convertToDatabaseColumn(password));
     }
 

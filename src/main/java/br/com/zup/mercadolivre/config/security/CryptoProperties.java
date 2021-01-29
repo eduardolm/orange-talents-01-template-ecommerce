@@ -1,8 +1,10 @@
 package br.com.zup.mercadolivre.config.security;
 
-import org.springframework.beans.factory.annotation.Value;
+import br.com.zup.mercadolivre.config.BeanUtil;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -13,14 +15,14 @@ import java.util.Base64;
 
 @Converter
 @Configuration
+@Configurable
 @PropertySource("classpath:application.properties")
-public class CryptoConverter implements AttributeConverter<String, String>, CryptoConverterInterface {
+public class CryptoProperties implements AttributeConverter<String, String>, CryptoConverterInterface {
 
-    @Value("${crypto.secret.key}")
-    private static String secret;
+    private String secret = BeanUtil.getBean(Environment.class).getProperty("crypto.secret.key");
 
-    private static String ALGORITHM = "AES/ECB/PKCS5Padding";
-    private static byte[] KEY = "SomeVeryStrongKey".getBytes();
+    private final String ALGORITHM = "AES/ECB/PKCS5Padding";
+    private final byte[] KEY = secret.getBytes();
 
     @Override
     public String convertToDatabaseColumn(String inputValue) {
@@ -44,5 +46,13 @@ public class CryptoConverter implements AttributeConverter<String, String>, Cryp
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public String getSecret() {
+        return secret;
     }
 }
