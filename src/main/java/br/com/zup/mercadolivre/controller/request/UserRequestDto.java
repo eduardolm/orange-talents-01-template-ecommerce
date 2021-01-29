@@ -1,23 +1,27 @@
 package br.com.zup.mercadolivre.controller.request;
 
+import br.com.zup.mercadolivre.config.security.CryptoConverter;
+import br.com.zup.mercadolivre.config.security.CryptoConverterInterface;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.validator.UniqueValue;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class UseRequestDto {
+public class UserRequestDto {
 
     @NotBlank(message = "O e-mail é obrigatório.")
     @UniqueValue(domainClass = User.class, fieldName = "email", message = "E-mail já cadastrado.")
+    @Email(message = "Formato de e-mail inválido.")
     private String email;
 
-    @NotBlank(message = "A senha é obrigatória.")
-    @Size(min = 6)
+    @NotBlank(message = "O campo da senha não pode ser deixado em branco.")
+    @Size(min = 6, max = 50, message = "A senha deve conter entre 6 e 50 caracteres.")
     private String password;
 
-    public User toModel() {
-        return new User(email, password);
+    public User toModel(CryptoConverter crypto) {
+        return new User(email, crypto.convertToDatabaseColumn(password));
     }
 
     public String getEmail() {

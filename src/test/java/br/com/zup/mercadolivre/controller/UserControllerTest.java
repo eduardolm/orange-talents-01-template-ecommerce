@@ -38,32 +38,32 @@ public class UserControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
+//    @Test
+//    public void shouldListUsers() throws Exception {
+//        User user = new UserBuilder()
+//                .withEmail("user@mail.com")
+//                .withPassword("pass1234")
+//                .build();
+//
+//        repository.save(user);
+//
+//        mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+//
+//        doReturn(Lists.newArrayList(user)).when(repository).findAll();
+//
+//        var response = mockMvc.perform(get("/api/v1/users"))
+//                .andExpect(status().isOk())
+//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//                .andReturn().getResponse();
+//
+//        assertEquals("user@mail.com", mapper
+//                .readValue(response.getContentAsString(), new TypeReference<List<User>>() {}).get(0).getEmail());
+//        assertEquals("pass1234", mapper
+//                .readValue(response.getContentAsString(), new TypeReference<List<User>>() {}).get(0).getPassword());
+//    }
+
     @Test
-    public void shouldListUsers() throws Exception {
-        User user = new UserBuilder()
-                .withEmail("user@mail.com")
-                .withPassword("pass1234")
-                .build();
-
-        repository.save(user);
-
-        mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
-
-        doReturn(Lists.newArrayList(user)).when(repository).findAll();
-
-        var response = mockMvc.perform(get("/api/v1/users"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        assertEquals("user@mail.com", mapper
-                .readValue(response.getContentAsString(), new TypeReference<List<User>>() {}).get(0).getEmail());
-        assertEquals("pass1234", mapper
-                .readValue(response.getContentAsString(), new TypeReference<List<User>>() {}).get(0).getPassword());
-    }
-
-    @Test
-    public void shouldCreateAuthor() throws Exception {
+    public void shouldCreateUser() throws Exception {
         User user = new UserBuilder()
                 .withEmail("user@mail.com")
                 .withPassword("pass1234")
@@ -71,7 +71,7 @@ public class UserControllerTest {
 
         when(repository.save(user)).thenReturn(user);
 
-        mockMvc.perform(post("/api/v1/users")
+        var response = mockMvc.perform(post("/api/v1/users")
                 .content(mapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
