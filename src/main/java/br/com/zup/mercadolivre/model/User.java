@@ -1,9 +1,8 @@
 package br.com.zup.mercadolivre.model;
 
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "usuarios")
@@ -25,7 +24,7 @@ public class User {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
     public User() {
@@ -66,19 +65,18 @@ public class User {
             return false;
         }
         User other = (User) obj;
-        return (Objects.equals(id, other.getId()))
-                && (Objects.equals(email, other.getEmail()))
-                && (Objects.equals(password, other.getPassword()))
-                && (Objects.equals(createdAt, other.getCreatedAt()));
+        boolean emailEquals = (this.email == null && other.email == null)
+                || (this.email != null && this.email.equals(other.email));
+        boolean createdAtEquals = (this.createdAt == null && other.createdAt == null)
+                || (this.createdAt != null && this.createdAt.equals(other.createdAt));
+        return emailEquals && createdAtEquals;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + ((email == null) ? 0 : email.hashCode());
-        result = prime * result + ((password == null) ? 0 : password.hashCode());
         result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
         return result;
     }

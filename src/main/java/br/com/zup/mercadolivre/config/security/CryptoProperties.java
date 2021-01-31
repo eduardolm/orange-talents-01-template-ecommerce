@@ -3,6 +3,7 @@ package br.com.zup.mercadolivre.config.security;
 import br.com.zup.mercadolivre.config.BeanUtil;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
@@ -17,7 +18,8 @@ import java.util.Base64;
 @Configuration
 @Configurable
 @PropertySource("classpath:application.properties")
-public class CryptoProperties implements AttributeConverter<String, String>, CryptoConverterInterface {
+@Profile(value = {"prod", "dev", "test"})
+public class CryptoProperties implements AttributeConverter<String, String>, CryptoPropertiesInterface {
 
     private String secret = BeanUtil.getBean(Environment.class).getProperty("crypto.secret.key");
 

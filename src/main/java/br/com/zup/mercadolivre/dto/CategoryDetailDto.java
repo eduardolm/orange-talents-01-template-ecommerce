@@ -8,18 +8,19 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties({"hibernate_lazy_initializer", "handler"})
-public class CategoryDto {
+public class CategoryDetailDto {
 
     private Long id;
     private String name;
     private Category parent;
     private List<Category> children;
 
-    public CategoryDto(Category category) {
+    public CategoryDetailDto(Category category) {
         this.id = category.getId();
         this.name = category.getName();
         this.parent = category.getParent();
@@ -40,5 +41,13 @@ public class CategoryDto {
 
     public List<Category> getChildren() {
         return children;
+    }
+
+    public void setChildren(List<Category> children) {
+        this.children = children;
+    }
+
+    public void setParent(Category parent) {
+        this.parent = parent;
     }
 }

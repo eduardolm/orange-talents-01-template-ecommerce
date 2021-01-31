@@ -7,53 +7,62 @@ import org.springframework.util.Assert;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class CategoryRequestDto {
-
-    private Long id;
 
     @NotBlank(message = "Nome da categoria é obrigatório.")
     @UniqueValue(domainClass = Category.class, fieldName = "name", message = "Categoria já cadastrada.")
     private String name;
 
-    @Positive(message = "Id deve ser um inteiro positovo.")
-    private Long idMotherCategory;
+    @Positive(message = "Id deve ser um inteiro positivo.")
+    private Long idParentCategory;
 
-    public Long getId() {
-        return id;
+    public CategoryRequestDto() {
+    }
+
+    public CategoryRequestDto(@NotBlank(message = "Nome da categoria é obrigatório.") String name) {
+        this.name = name;
     }
 
     public String getName() {
         return name;
     }
 
-    public Long getIdMotherCategory() {
-        return idMotherCategory;
+    public Long getIdParentCategory() {
+        return idParentCategory;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setIdMotherCategory(Long idMotherCategory) {
-        this.idMotherCategory = idMotherCategory;
+    public void setIdParentCategory(Long idParentCategory) {
+        this.idParentCategory = idParentCategory;
     }
 
     @Override
     public String toString() {
         return "CategoryRequestDto{" +
-                "name='" + name + '\'' +
-                ", idMotherCategory=" + idMotherCategory +
+                "Categoria='" + name + '\'' +
+                ", idCategoriaMae=" + idParentCategory +
                 '}';
     }
 
     public Category toModel(CategoryRepository repository) {
         Category category = new Category(name);
-        if (idMotherCategory != null) {
-            Optional<Category> motherCategory = repository.findById(idMotherCategory);
-            Assert.notNull(motherCategory, "O id da categoria mãe precisa ser válido.");
-            motherCategory.ifPresent(category::setMotherCategory);
+        if (idParentCategory != null) {
+            Optional<Category> parentCategory = repository.findById(idParentCategory);
+            Assert.notNull(parentCategory, "O id da categoria mãe precisa ser válido.");
+            if (parentCategory.isPresent()) {
+                parentCategory.get().getChildren().add(category);
+                repository.save(parentCategory.get());
+                category.setParent(parentCategory.get());
+            }
+            else {
+                throw new NoSuchElementException("Categoria mãe não encontrada.");
+            }
         }
         return category;
     }

@@ -6,6 +6,7 @@ public class UserBuilder {
 
     private String email;
     private String password;
+
     public UserBuilder withEmail(String email) {
         this.email = email;
         return this;
