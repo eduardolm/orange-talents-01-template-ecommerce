@@ -1,6 +1,5 @@
 package br.com.zup.mercadolivre.validator.constraint;
 
-
 import br.com.zup.mercadolivre.validator.CPFeCNPJ;
 
 import javax.validation.ConstraintValidator;

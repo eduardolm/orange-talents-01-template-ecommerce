@@ -1,7 +1,6 @@
 package br.com.zup.mercadolivre.controller;
 
 import br.com.zup.mercadolivre.controller.request.CategoryRequestDto;
-import br.com.zup.mercadolivre.dto.CategoryDetailDto;
 import br.com.zup.mercadolivre.dto.CategoryDto;
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.repository.CategoryRepository;

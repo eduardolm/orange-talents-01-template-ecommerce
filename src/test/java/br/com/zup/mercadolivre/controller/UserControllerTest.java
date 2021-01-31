@@ -90,22 +90,4 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn().getResponse();
     }
-
-//    @Test
-//    public void shouldReturnErrorWhenPasswordBlank() throws Exception {
-//        UserRequestDto userRequestDto = new UserRequestDtoBuilder()
-//                .withEmail("user5@email.com")
-//                .withPassword("")
-//                .build();
-//
-//        mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
-//        User user = userRequestDto.toModel(crypto);
-//
-//        when(repository.save(user)).thenThrow(new MethodArgumentNotValidException(user.getPassword(), ));
-//
-//        var response = mockMvc.perform(post("/api/v1/users")
-//                .content(mapper.writeValueAsString(user))
-//                .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest()).andReturn().getResponse();
-//    }
 }
