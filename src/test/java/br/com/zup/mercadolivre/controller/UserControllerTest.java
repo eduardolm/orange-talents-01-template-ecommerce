@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,6 +51,7 @@ public class UserControllerTest {
     private PasswordEncoder encoder;
 
     @Test
+    @WithMockUser(username = "user2@email.com", password = "pass1234")
     public void shouldListUsers() throws Exception {
         User user = new UserBuilder()
                 .withEmail("user@mail.com")
@@ -86,7 +88,7 @@ public class UserControllerTest {
         when(repository.save(user)).thenReturn(user);
 
         var response = mockMvc.perform(post("/api/v1/users")
-                .content(mapper.writeValueAsString(user))
+                .content(mapper.writeValueAsString(userRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn().getResponse();
     }
