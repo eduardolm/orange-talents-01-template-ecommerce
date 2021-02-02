@@ -2,9 +2,11 @@ package br.com.zup.mercadolivre.controller.request;
 
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
+import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -30,6 +32,7 @@ public class ProductRequestDto {
     private BigDecimal price;
 
     @NotNull(message = "Obrigatório informar a categoria.")
+    @Valid
     private Long categoryId;
 
     @Deprecated
@@ -83,8 +86,8 @@ public class ProductRequestDto {
                 '}';
     }
 
-    public Product toModel(CategoryRepository repository) {
+    public Product toModel(CategoryRepository repository, User productOwner) {
         Category category = repository.findById(categoryId).orElseThrow(() -> new NoSuchElementException("Categoria não encontrada."));
-        return new Product(name, quantity, description, price, category);
+        return new Product(name, quantity, description, price, category, productOwner);
     }
 }

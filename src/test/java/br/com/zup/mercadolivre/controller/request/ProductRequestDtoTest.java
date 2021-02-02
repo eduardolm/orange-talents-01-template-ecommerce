@@ -2,10 +2,12 @@ package br.com.zup.mercadolivre.controller.request;
 
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
+import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
 import br.com.zup.mercadolivre.repository.ProductRepository;
 import br.com.zup.mercadolivre.utils.builder.CategoryBuilder;
 import br.com.zup.mercadolivre.utils.builder.ProductRequestDtoBuilder;
+import br.com.zup.mercadolivre.utils.builder.UserBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,6 +66,7 @@ public class ProductRequestDtoTest {
 
     @Test
     public void shouldToModelCreateProductInstance() {
+        User user = new UserBuilder().withEmail("user2@email.com").withPassword("pass1234").build();
 
         Product product = (new ProductRequestDtoBuilder()
                 .withName("Galaxy S20")
@@ -71,7 +74,7 @@ public class ProductRequestDtoTest {
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
                 .withCategory(1L)
-                .build()).toModel(categoryRepository);
+                .build()).toModel(categoryRepository, user);
 
         assertTrue(product instanceof Product);
         assertEquals("Galaxy S20", product.getName());

@@ -2,7 +2,7 @@ package br.com.zup.mercadolivre.utils.builder;
 
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
-import com.fasterxml.jackson.databind.PropertyMetadata;
+import br.com.zup.mercadolivre.model.User;
 
 import java.math.BigDecimal;
 
@@ -13,6 +13,7 @@ public class ProductBuilder {
     private String description;
     private BigDecimal price;
     private Category category;
+    private User productOwner;
 
     public ProductBuilder withName(String name) {
         this.name = name;
@@ -39,7 +40,12 @@ public class ProductBuilder {
         return this;
     }
 
+    public ProductBuilder withProductOwner(User user) {
+        this.productOwner = user;
+        return this;
+    }
+
     public Product build() {
-        return new Product(name, quantity, description, price, category);
+        return new Product(name, quantity, description, price, category, productOwner);
     }
 }

@@ -13,6 +13,7 @@ public class ProductDto {
     private String description;
     private BigDecimal price;
     private Category category;
+    private UserDto productOwner;
 
     public ProductDto(Product product) {
         this.id = product.getId();
@@ -21,6 +22,7 @@ public class ProductDto {
         this.description = product.getDescription();
         this.price = product.getPrice();
         this.category = product.getCategory();
+        this.productOwner = new UserDto(product.getProductOwner());
     }
 
     public Long getId() {
@@ -45,5 +47,9 @@ public class ProductDto {
 
     public Category getCategory() {
         return category;
+    }
+
+    public UserDto getProductOwner() {
+        return productOwner;
     }
 }

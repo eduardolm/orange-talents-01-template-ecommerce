@@ -3,8 +3,10 @@ package br.com.zup.mercadolivre.controller;
 import br.com.zup.mercadolivre.controller.request.ProductRequestDto;
 import br.com.zup.mercadolivre.dto.ProductDto;
 import br.com.zup.mercadolivre.model.Product;
+import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
 import br.com.zup.mercadolivre.repository.ProductRepository;
+import br.com.zup.mercadolivre.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +24,16 @@ public class ProductController {
     private ProductRepository productRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private CategoryRepository categoryRepository;
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid ProductRequestDto productRequestDto) {
-        Product product = productRequestDto.toModel(categoryRepository);
+        // Simulando usuário logado
+        User productOwner = userRepository.findUserByEmail("user2@email.com").get();
+        Product product = productRequestDto.toModel(categoryRepository, productOwner);
         return ResponseEntity.ok(new ProductDto(productRepository.save(product)));
     }
 

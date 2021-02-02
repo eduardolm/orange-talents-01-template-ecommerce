@@ -26,12 +26,16 @@ public class Product {
     @ManyToOne
     private Category category;
 
-    public Product(String name, Integer quantity, String description, BigDecimal price, Category category) {
+    @ManyToOne
+    private User productOwner;
+
+    public Product(String name, Integer quantity, String description, BigDecimal price, Category category, User productOwner) {
         this.name = name;
         this.quantity = quantity;
         this.description = description;
         this.price = price;
         this.category = category;
+        this.productOwner = productOwner;
     }
 
     @Deprecated
@@ -63,6 +67,10 @@ public class Product {
         return category;
     }
 
+    public User getProductOwner() {
+        return productOwner;
+    }
+
     @Override
     public String toString() {
         return "Produto{" +
@@ -72,23 +80,24 @@ public class Product {
                 ", Descrição:'" + description + '\'' +
                 ", Preço:" + price +
                 ", Categoria:" + category.getName() +
+                ", Usuário:'" + productOwner + '\'' +
                 '}';
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Product)) return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Product)) return false;
 
-        Product product = (Product) obj;
+        Product product = (Product) o;
 
-        if (!getId().equals(product.getId())) return false;
         if (!getName().equals(product.getName())) return false;
         if (getQuantity() != null ? !getQuantity().equals(product.getQuantity()) : product.getQuantity() != null)
             return false;
         if (!getDescription().equals(product.getDescription())) return false;
         if (!getPrice().equals(product.getPrice())) return false;
-        return getCategory().equals(product.getCategory());
+        if (!getCategory().equals(product.getCategory())) return false;
+        return getProductOwner().equals(product.getProductOwner());
     }
 
     @Override
@@ -100,6 +109,7 @@ public class Product {
         result = prime * result + getDescription().hashCode();
         result = prime * result + getPrice().hashCode();
         result = prime * result + getCategory().hashCode();
+        result = prime * result + getProductOwner().hashCode();
         return result;
     }
 }
