@@ -87,7 +87,9 @@ public class ProductRequestDto {
     }
 
     public Product toModel(CategoryRepository repository, User productOwner) {
-        Category category = repository.findById(categoryId).orElseThrow(() -> new NoSuchElementException("Categoria não encontrada."));
-        return new Product(name, quantity, description, price, category, productOwner);
+        Category category = repository.findById(categoryId).orElseThrow(() ->
+                new NoSuchElementException("Categoria não encontrada."));
+        Product product = new Product(name, quantity, description, price, category, productOwner);
+        return product;
     }
 }

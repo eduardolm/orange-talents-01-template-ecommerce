@@ -92,6 +92,8 @@ public class ProductControllerTest {
                 .andReturn();
     }
 
+    // TODO: Corrigir este teste de criação do produto
+
     @Test
     @WithMockUser(username = "user2@email.com", password = "pass1234")
     public void shouldCreateProduct() throws Exception {
@@ -109,9 +111,10 @@ public class ProductControllerTest {
 
         when(repository.save(product)).thenReturn(product);
 
-        var response = mockMvc.perform(post("/api/v1/users")
+        var response = mockMvc.perform(post("/api/v1/products")
                 .content(mapper.writeValueAsString(productRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn().getResponse();
+                .andExpect(status().isOk())
+                .andReturn();
     }
 }
