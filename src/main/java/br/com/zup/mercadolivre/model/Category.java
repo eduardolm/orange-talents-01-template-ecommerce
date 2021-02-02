@@ -30,6 +30,7 @@ public class Category {
         return children;
     }
 
+    @Deprecated
     public Category() {
     }
 
