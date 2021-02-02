@@ -47,12 +47,12 @@ public class CategoryControllerTest {
         when(repository.save(category)).thenReturn(category);
 
         var response = mockMvc.perform(post("/api/v1/categories")
-                .content(mapper.writeValueAsString(category))
+                .content(mapper.writeValueAsString(categoryRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn().getResponse();
 
         assertEquals(200, response.getStatus());
         assertEquals("Test Category", mapper
-                .readValue(response.getContentAsString(), new TypeReference<Category>() {}).getName());
+                .readValue(response.getContentAsString(), Category.class).getName());
     }
 }

@@ -2,6 +2,7 @@ package br.com.zup.mercadolivre.controller;
 
 import br.com.zup.mercadolivre.config.security.TokenManager;
 import br.com.zup.mercadolivre.controller.request.LoginInputDto;
+import br.com.zup.mercadolivre.dto.TokenDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +29,16 @@ public class UserAuthenticationController {
 
     private static final Logger log = LoggerFactory.getLogger(UserAuthenticationController.class);
 
-
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> authenticate(@RequestBody LoginInputDto loginInfo) {
-
+    public ResponseEntity<?> authenticate(@RequestBody LoginInputDto loginInfo) {
         UsernamePasswordAuthenticationToken authenticationToken = loginInfo.build();
 
         try {
             Authentication authentication = authManager.authenticate(authenticationToken);
             String jwt = tokenManager.generateToken(authentication);
 
-            return ResponseEntity.ok(jwt);
+            return ResponseEntity.ok(new TokenDto(jwt));
 
         } catch (AuthenticationException e) {
             log.error("[Autenticacao] {}",e);

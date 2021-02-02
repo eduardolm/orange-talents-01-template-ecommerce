@@ -1,6 +1,5 @@
 package br.com.zup.mercadolivre.controller;
 
-import br.com.zup.mercadolivre.config.security.CryptoProperties;
 import br.com.zup.mercadolivre.controller.request.UserRequestDto;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.UserRepository;
@@ -17,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,7 +47,7 @@ public class UserControllerTest {
     private ObjectMapper mapper;
 
     @Autowired
-    private CryptoProperties crypto;
+    private PasswordEncoder encoder;
 
     @Test
     public void shouldListUsers() throws Exception {
@@ -81,7 +81,7 @@ public class UserControllerTest {
                 .build();
 
         mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
-        User user = userRequestDto.toModel(crypto);
+        User user = userRequestDto.toModel(encoder);
 
         when(repository.save(user)).thenReturn(user);
 

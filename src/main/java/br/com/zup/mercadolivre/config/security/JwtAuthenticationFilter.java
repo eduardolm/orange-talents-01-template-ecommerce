@@ -19,7 +19,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private TokenManager tokenManager;
     private UserService userService;
 
-    public JwtAuthenticationFilter(TokenManager tokenManager, UserService usersService) {
+    public JwtAuthenticationFilter(TokenManager tokenManager, UserService userService) {
         this.tokenManager = tokenManager;
         this.userService = userService;
     }
@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (possibleToken.isPresent() && tokenManager.isValid(possibleToken.get())) {
 
-            String userName = tokenManager.getUserName(possibleToken.get());
+            String userName = tokenManager.getUserName(possibleToken.get().split(" ")[1]);
             UserDetails userDetails = userService.loadUserByUsername(userName);
 
             UsernamePasswordAuthenticationToken authentication =

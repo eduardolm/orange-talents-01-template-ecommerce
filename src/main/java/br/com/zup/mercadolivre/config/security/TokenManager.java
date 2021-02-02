@@ -1,5 +1,6 @@
 package br.com.zup.mercadolivre.config.security;
 
+import java.util.Base64;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -29,17 +30,17 @@ public class TokenManager {
         final Date expiration = new Date(now.getTime() + this.expirationInMillis);
 
         return Jwts.builder()
-                .setIssuer("Desafio jornada dev eficiente mercado livre")
+                .setIssuer("Desafio MercadoLivre ZUP Orange Talents")
                 .setSubject(user.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiration)
-                .signWith(SignatureAlgorithm.HS256, this.secret)
+                .signWith(SignatureAlgorithm.HS256, Base64.getEncoder().encodeToString(this.secret.getBytes()))
                 .compact();
     }
 
     public boolean isValid(String jwt) {
         try {
-            Jwts.parser().setSigningKey(this.secret).parseClaimsJws(jwt);
+            Jwts.parser().setSigningKey(Base64.getEncoder().encodeToString(this.secret.getBytes())).parseClaimsJws(jwt.split(" ")[1]);
             return true;
 
         } catch (JwtException | IllegalArgumentException e) {
@@ -48,7 +49,7 @@ public class TokenManager {
     }
 
     public String getUserName(String jwt) {
-        Claims claims = Jwts.parser().setSigningKey(this.secret)
+        Claims claims = Jwts.parser().setSigningKey(Base64.getEncoder().encodeToString(this.secret.getBytes()))
                 .parseClaimsJws(jwt).getBody();
 
         return claims.getSubject();

@@ -1,6 +1,5 @@
 package br.com.zup.mercadolivre.controller.request;
 
-import br.com.zup.mercadolivre.config.security.CryptoProperties;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.utils.builder.UserBuilder;
 import br.com.zup.mercadolivre.utils.builder.UserRequestDtoBuilder;
@@ -8,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -25,7 +25,7 @@ public class UserRequestDtoTest {
     private Validator validator;
 
     @Autowired
-    private CryptoProperties crypto;
+    private PasswordEncoder encoder;
 
     @Test
     public void testToModel() {
@@ -34,7 +34,7 @@ public class UserRequestDtoTest {
                 .withPassword("pass12345")
                 .build();
 
-        var testUser = userRequestDto.toModel(this.crypto);
+        var testUser = userRequestDto.toModel(this.encoder);
         var newUser = new UserBuilder()
                 .withEmail("user@email.com")
                 .withPassword("pass12345")
