@@ -53,4 +53,15 @@ public class UserTest {
         assertEquals(user1.hashCode(), user2.hashCode());
         assertEquals(user1.getEmail(), user2.getEmail());
     }
+
+    @Test
+    public void shouldUserGetterWorkCorrectly() {
+        User user = new UserBuilder()
+                .withEmail("user@mail.com")
+                .withPassword("pass1234")
+                .build();
+
+        assertEquals("user@mail.com", user.getEmail());
+        assertEquals("pass1234", user.getPassword());
+    }
 }
