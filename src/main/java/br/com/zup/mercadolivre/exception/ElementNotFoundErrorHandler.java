@@ -1,6 +1,5 @@
 package br.com.zup.mercadolivre.exception;
 
-
 import br.com.zup.mercadolivre.exception.dto.NoSuchElementExceptionOutputDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

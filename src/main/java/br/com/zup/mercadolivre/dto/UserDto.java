@@ -8,8 +8,8 @@ public class UserDto {
     private String email;
 
     public UserDto(User user) {
-        this.email = user.getEmail();
         this.id = user.getId();
+        this.email = user.getEmail();
     }
 
     public Long getId() {
