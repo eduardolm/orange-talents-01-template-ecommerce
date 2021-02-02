@@ -52,6 +52,26 @@ public class ProductRequestDto {
         this.categoryId = categoryId;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
     @Override
     public String toString() {
         return "ProductRequestDto{" +
