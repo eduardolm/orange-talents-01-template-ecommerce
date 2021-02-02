@@ -7,12 +7,10 @@ import br.com.zup.mercadolivre.repository.CategoryRepository;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProductRequestDto {
 
@@ -35,6 +33,10 @@ public class ProductRequestDto {
     @Valid
     private Long categoryId;
 
+    @Size(min = 3, message = "É preciso informar pelo menos três características do produto.")
+    @Valid
+    private List<CharacteristicsRequestDto> characteristics = new ArrayList<>();
+
     @Deprecated
     public ProductRequestDto(){}
 
@@ -46,13 +48,16 @@ public class ProductRequestDto {
                              @Length(max = 1000, message = "A descrição deve ter no máximo 1000 caracteres.") String description,
                              @NotNull(message = "O preço é obrigatório.")
                              @Positive(message = "Preço precisa ser um valor positivo.") BigDecimal price,
-                             @NotNull(message = "Obrigatório informar a categoria.") Long categoryId) {
+                             @NotNull(message = "Obrigatório informar a categoria.") Long categoryId,
+                             @Size(min = 3, message = "É preciso informar pelo menos três características do produto.")
+                                     List<CharacteristicsRequestDto> characteristics) {
 
         this.name = name;
         this.quantity = quantity;
         this.description = description;
         this.price = price;
         this.categoryId = categoryId;
+        this.characteristics.addAll(characteristics);
     }
 
     public String getName() {
@@ -75,21 +80,40 @@ public class ProductRequestDto {
         return categoryId;
     }
 
+    public List<CharacteristicsRequestDto> getCharacteristics() {
+        return characteristics;
+    }
+
     @Override
     public String toString() {
         return "ProductRequestDto{" +
-                "Nome:'" + name + '\'' +
+                "Preço:'" + name + '\'' +
                 ", Quantidade:" + quantity +
                 ", Descrição:'" + description + '\'' +
                 ", Preço:" + price +
                 ", CategoriaId:" + categoryId +
+                ", Características:" + characteristics.stream().map(item ->
+                     item.getName() + ": " + item.getDescription()).collect(Collectors.toList()) +
                 '}';
     }
 
     public Product toModel(CategoryRepository repository, User productOwner) {
         Category category = repository.findById(categoryId).orElseThrow(() ->
                 new NoSuchElementException("Categoria não encontrada."));
-        Product product = new Product(name, quantity, description, price, category, productOwner);
+
+        Product product = new Product(name, quantity, description, price, category, productOwner, characteristics);
         return product;
+    }
+
+    public Set<String> findRepeatedCharacteristics() {
+        HashSet<String> equalNames = new HashSet<>();
+        HashSet<String> result = new HashSet<>();
+        for (CharacteristicsRequestDto characteristic : characteristics) {
+            String name = characteristic.getName();
+            if (equalNames.add(name)) {
+                result.add(name);
+            }
+        }
+        return result;
     }
 }

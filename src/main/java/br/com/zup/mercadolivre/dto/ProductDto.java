@@ -14,6 +14,7 @@ public class ProductDto {
     private BigDecimal price;
     private Category category;
     private UserDto productOwner;
+    private CharacteristicsDto characteristics;
 
     public ProductDto(Product product) {
         this.id = product.getId();
@@ -23,6 +24,7 @@ public class ProductDto {
         this.price = product.getPrice();
         this.category = product.getCategory();
         this.productOwner = new UserDto(product.getProductOwner());
+        this.characteristics = new CharaceristicsDto(product.getCharacteristics());
     }
 
     public Long getId() {
@@ -51,5 +53,9 @@ public class ProductDto {
 
     public UserDto getProductOwner() {
         return productOwner;
+    }
+
+    public CharacteristicsDto getCharacteristics() {
+        return characteristics;
     }
 }

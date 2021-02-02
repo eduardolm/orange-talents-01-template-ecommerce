@@ -8,6 +8,7 @@ import br.com.zup.mercadolivre.repository.ProductRepository;
 import br.com.zup.mercadolivre.utils.builder.CategoryBuilder;
 import br.com.zup.mercadolivre.utils.builder.ProductRequestDtoBuilder;
 import br.com.zup.mercadolivre.utils.builder.UserBuilder;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,6 +60,9 @@ public class ProductRequestDtoTest {
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
                 .withCategory(2L)
+                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
+                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
+                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
         assertTrue(productRequestDto instanceof ProductRequestDto);
@@ -74,6 +78,9 @@ public class ProductRequestDtoTest {
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
                 .withCategory(1L)
+                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
+                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
+                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build()).toModel(categoryRepository, user);
 
         assertTrue(product instanceof Product);
@@ -87,7 +94,10 @@ public class ProductRequestDtoTest {
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(1L)
+                .withCategory(2L)
+                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
+                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
+                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
         assertEquals(1, validator.validate(product).size());
@@ -100,7 +110,10 @@ public class ProductRequestDtoTest {
                 .withQuantity(0)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(1L)
+                .withCategory(2L)
+                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
+                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
+                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
         assertTrue(product instanceof ProductRequestDto);
@@ -113,7 +126,10 @@ public class ProductRequestDtoTest {
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("0"))
-                .withCategory(1L)
+                .withCategory(2L)
+                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
+                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
+                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
         assertEquals(1, validator.validate(product).size());
@@ -126,10 +142,14 @@ public class ProductRequestDtoTest {
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(1L)
+                .withCategory(2L)
+                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
+                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
+                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
-        assertEquals("ProductRequestDto{Nome:'Galaxy S20', Quantidade:100, Descrição:'Celular top da " +
-                "categoria', Preço:2000, CategoriaId:1}", product.toString());
+        assertEquals("ProductRequestDto{Preço:'Galaxy S20', Quantidade:100, Descrição:'Celular top da " +
+                "categoria', Preço:2000, CategoriaId:2, Características:[Peso: 145g, Conectividade: 5G, Wi-Fi, " +
+                "Bluetooth, Itens incluídos: Celular, carregador, cabo mini usb]}", product.toString());
     }
 }

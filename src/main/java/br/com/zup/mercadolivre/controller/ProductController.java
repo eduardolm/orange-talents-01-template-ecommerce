@@ -7,8 +7,10 @@ import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
 import br.com.zup.mercadolivre.repository.ProductRepository;
 import br.com.zup.mercadolivre.repository.UserRepository;
+import br.com.zup.mercadolivre.validator.SameNameCharacteristicsValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,6 +30,11 @@ public class ProductController {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @InitBinder
+    public void init(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(new SameNameCharacteristicsValidator());
+    }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid ProductRequestDto productRequestDto) {

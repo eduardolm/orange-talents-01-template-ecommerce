@@ -1,7 +1,11 @@
 package br.com.zup.mercadolivre.model;
 
+import br.com.zup.mercadolivre.dto.CharaceristicsDto;
+
 import javax.persistence.*;
+import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.util.Collection;
 
 @Entity
 @Table(name = "produtos")
@@ -29,13 +33,21 @@ public class Product {
     @ManyToOne
     private User productOwner;
 
-    public Product(String name, Integer quantity, String description, BigDecimal price, Category category, User productOwner) {
+    public Product(String name,
+                   Integer quantity,
+                   String description,
+                   BigDecimal price,
+                   Category category,
+                   User productOwner,
+                   @Valid Collection<CharaceristicsDto> characeristics) {
+
         this.name = name;
         this.quantity = quantity;
         this.description = description;
         this.price = price;
         this.category = category;
         this.productOwner = productOwner;
+        characeristics.stream().map(characeristic -> characeristic.toModel(this));
     }
 
     @Deprecated
