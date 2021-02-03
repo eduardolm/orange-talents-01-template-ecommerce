@@ -1,38 +1,35 @@
 package br.com.zup.mercadolivre.dto;
 
+import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
-import br.com.zup.mercadolivre.model.ProductCharacteristics;
 
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ProductDto {
+public class ProductDetailDto {
 
     private Long id;
     private String name;
     private Integer quantity;
     private String description;
     private BigDecimal price;
-    private String category;
-    private String productOwner;
-    private Map<String, String> characteristics;
+    private Category category;
+    private UserDto productOwner;
+    private Set<ProductCharacteristicsDto> characteristics;
 
-    @Deprecated
-    public ProductDto() {
-    }
-
-    public ProductDto(Product product) {
+    public ProductDetailDto(Product product) {
+        List<ProductCharacteristicsDto> tempList = new ArrayList<>();
         this.id = product.getId();
         this.name = product.getName();
         this.quantity = product.getQuantity();
         this.description = product.getDescription();
         this.price = product.getPrice();
-        this.category = product.getCategory().getName();
-        this.productOwner = product.getProductOwner().getEmail();
-//        this.characteristics = product.getCharacteristics().stream().map(item -> new ProductCharacteristicsDto(item).getName()).collect(Collectors.toSet());
-        this.characteristics = product.getCharacteristics().stream().collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription));
+        this.category = product.getCategory();
+        this.productOwner = new UserDto(product.getProductOwner());
+        this.characteristics = product.getCharacteristics().stream().map(ProductCharacteristicsDto::new).collect(Collectors.toSet());
     }
 
     public Long getId() {
@@ -55,15 +52,15 @@ public class ProductDto {
         return price;
     }
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public String getProductOwner() {
+    public UserDto getProductOwner() {
         return productOwner;
     }
 
-    public Map<String, String> getCharacteristics() {
+    public Set<ProductCharacteristicsDto> getCharacteristics() {
         return characteristics;
     }
 }

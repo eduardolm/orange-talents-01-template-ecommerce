@@ -1,6 +1,7 @@
 package br.com.zup.mercadolivre.controller;
 
 import br.com.zup.mercadolivre.controller.request.ProductRequestDto;
+import br.com.zup.mercadolivre.dto.ProductDetailDto;
 import br.com.zup.mercadolivre.dto.ProductDto;
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.User;
@@ -41,7 +42,7 @@ public class ProductController {
         // Simulando usuário logado
         User productOwner = userRepository.findUserByEmail("user@email.com").get();
         Product product = productRequestDto.toModel(categoryRepository, productOwner);
-        return ResponseEntity.ok(new ProductDto(productRepository.save(product)));
+        return ResponseEntity.ok(new ProductDetailDto(productRepository.save(product)));
     }
 
     @GetMapping
@@ -54,7 +55,7 @@ public class ProductController {
     public ResponseEntity<?> findById(@PathVariable() Long id) {
         Optional<Product> product = productRepository.findById(id);
         if (product.isPresent()) {
-            return ResponseEntity.ok().body(new ProductDto(product.get()));
+            return ResponseEntity.ok().body(new ProductDetailDto(product.get()));
         }
         return ResponseEntity.notFound().build();
     }
