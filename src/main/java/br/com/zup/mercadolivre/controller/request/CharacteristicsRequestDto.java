@@ -1,5 +1,8 @@
 package br.com.zup.mercadolivre.controller.request;
 
+import br.com.zup.mercadolivre.model.Product;
+import br.com.zup.mercadolivre.model.ProductCharacteristics;
+
 import javax.validation.constraints.NotBlank;
 
 public class CharacteristicsRequestDto {
@@ -30,5 +33,9 @@ public class CharacteristicsRequestDto {
                 "Nome:'" + name + '\'' +
                 ", Descrição:'" + description + '\'' +
                 '}';
+    }
+
+    public ProductCharacteristics toModel(Product product) {
+        return new ProductCharacteristics(name, description, product);
     }
 }

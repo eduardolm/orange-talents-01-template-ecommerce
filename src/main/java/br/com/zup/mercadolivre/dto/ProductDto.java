@@ -2,8 +2,12 @@ package br.com.zup.mercadolivre.dto;
 
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
+import br.com.zup.mercadolivre.model.ProductCharacteristics;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class ProductDto {
 
@@ -14,9 +18,10 @@ public class ProductDto {
     private BigDecimal price;
     private Category category;
     private UserDto productOwner;
-    private CharacteristicsDto characteristics;
+    private Set<ProductCharacteristics> characteristics;
 
     public ProductDto(Product product) {
+        List<ProductCharacteristicsDto> tempList = new ArrayList<>();
         this.id = product.getId();
         this.name = product.getName();
         this.quantity = product.getQuantity();
@@ -24,7 +29,7 @@ public class ProductDto {
         this.price = product.getPrice();
         this.category = product.getCategory();
         this.productOwner = new UserDto(product.getProductOwner());
-        this.characteristics = new CharaceristicsDto(product.getCharacteristics());
+        this.characteristics = product.getCharacteristics();
     }
 
     public Long getId() {
@@ -55,7 +60,7 @@ public class ProductDto {
         return productOwner;
     }
 
-    public CharacteristicsDto getCharacteristics() {
+    public Set<ProductCharacteristics> getCharacteristics() {
         return characteristics;
     }
 }

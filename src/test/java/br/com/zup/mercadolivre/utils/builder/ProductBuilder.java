@@ -1,10 +1,12 @@
 package br.com.zup.mercadolivre.utils.builder;
 
+import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.User;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 
 public class ProductBuilder {
 
@@ -14,6 +16,7 @@ public class ProductBuilder {
     private BigDecimal price;
     private Category category;
     private User productOwner;
+    private Collection<CharacteristicsRequestDto> characteristics;
 
     public ProductBuilder withName(String name) {
         this.name = name;
@@ -45,7 +48,12 @@ public class ProductBuilder {
         return this;
     }
 
+    public ProductBuilder withCharacteristics(Collection<CharacteristicsRequestDto> characteristics) {
+        this.characteristics = characteristics;
+        return this;
+    }
+
     public Product build() {
-        return new Product(name, quantity, description, price, category, productOwner);
+        return new Product(name, quantity, description, price, category, productOwner, characteristics);
     }
 }

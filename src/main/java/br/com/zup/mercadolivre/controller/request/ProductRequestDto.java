@@ -4,6 +4,8 @@ import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
+import br.com.zup.mercadolivre.validator.ExistsId;
+import br.com.zup.mercadolivre.validator.UniqueValue;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 public class ProductRequestDto {
 
     @NotBlank(message = "O nome é obrigatório.")
+    @UniqueValue(domainClass = Product.class, fieldName = "name")
     private String name;
 
     @NotNull(message = "A quantidade é obrigatória.")
@@ -30,7 +33,7 @@ public class ProductRequestDto {
     private BigDecimal price;
 
     @NotNull(message = "Obrigatório informar a categoria.")
-    @Valid
+    @ExistsId(domainClass = Category.class, fieldName = "id")
     private Long categoryId;
 
     @Size(min = 3, message = "É preciso informar pelo menos três características do produto.")
@@ -101,8 +104,7 @@ public class ProductRequestDto {
         Category category = repository.findById(categoryId).orElseThrow(() ->
                 new NoSuchElementException("Categoria não encontrada."));
 
-        Product product = new Product(name, quantity, description, price, category, productOwner, characteristics);
-        return product;
+        return new Product(name, quantity, description, price, category, productOwner, characteristics);
     }
 
     public Set<String> findRepeatedCharacteristics() {
@@ -110,7 +112,7 @@ public class ProductRequestDto {
         HashSet<String> result = new HashSet<>();
         for (CharacteristicsRequestDto characteristic : characteristics) {
             String name = characteristic.getName();
-            if (equalNames.add(name)) {
+            if (!equalNames.add(name)) {
                 result.add(name);
             }
         }

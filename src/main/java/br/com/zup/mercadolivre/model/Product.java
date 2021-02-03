@@ -1,11 +1,16 @@
 package br.com.zup.mercadolivre.model;
 
-import br.com.zup.mercadolivre.dto.CharaceristicsDto;
+import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
+import br.com.zup.mercadolivre.dto.ProductCharacteristicsDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.jsonwebtoken.lang.Assert;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "produtos")
@@ -33,13 +38,17 @@ public class Product {
     @ManyToOne
     private User productOwner;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Set<ProductCharacteristics> characteristics = new HashSet<>();
+
     public Product(String name,
                    Integer quantity,
                    String description,
                    BigDecimal price,
                    Category category,
                    User productOwner,
-                   @Valid Collection<CharaceristicsDto> characeristics) {
+                   @Valid Collection<CharacteristicsRequestDto> characteristics) {
 
         this.name = name;
         this.quantity = quantity;
@@ -47,7 +56,12 @@ public class Product {
         this.price = price;
         this.category = category;
         this.productOwner = productOwner;
-        characeristics.stream().map(characeristic -> characeristic.toModel(this));
+        Set<ProductCharacteristics> newCharacteristics = characteristics
+                .stream().map(characteristic -> characteristic.toModel(this))
+                .collect(Collectors.toSet());
+        this.characteristics.addAll(newCharacteristics);
+
+        Assert.isTrue(this.characteristics.size() >= 3, "Todo produto precisa ter no mínimo 3 catacterísticas.");
     }
 
     @Deprecated
@@ -83,16 +97,22 @@ public class Product {
         return productOwner;
     }
 
+    @JsonIgnore
+    public Set<ProductCharacteristics> getCharacteristics() {
+        return characteristics;
+    }
+
     @Override
     public String toString() {
-        return "Produto{" +
-                "id=" + id +
+        return "Product{" +
+                "Id" + id +
                 ", Nome:'" + name + '\'' +
                 ", Quantidade:" + quantity +
                 ", Descrição:'" + description + '\'' +
                 ", Preço:" + price +
-                ", Categoria:" + category.getName() +
-                ", Usuário:'" + productOwner + '\'' +
+                ", Categoria:" + category +
+                ", DonoProduto:" + productOwner +
+                ", Características:" + characteristics +
                 '}';
     }
 
@@ -108,20 +128,16 @@ public class Product {
             return false;
         if (!getDescription().equals(product.getDescription())) return false;
         if (!getPrice().equals(product.getPrice())) return false;
-        if (!getCategory().equals(product.getCategory())) return false;
         return getProductOwner().equals(product.getProductOwner());
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + getName().hashCode();
-        result = prime * result + (getQuantity() != null ? getQuantity().hashCode() : 0);
-        result = prime * result + getDescription().hashCode();
-        result = prime * result + getPrice().hashCode();
-        result = prime * result + getCategory().hashCode();
-        result = prime * result + getProductOwner().hashCode();
+        int result = getName().hashCode();
+        result = 31 * result + (getQuantity() != null ? getQuantity().hashCode() : 0);
+        result = 31 * result + getDescription().hashCode();
+        result = 31 * result + getPrice().hashCode();
+        result = 31 * result + getProductOwner().hashCode();
         return result;
     }
 }

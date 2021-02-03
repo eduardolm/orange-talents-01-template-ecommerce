@@ -39,7 +39,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid ProductRequestDto productRequestDto) {
         // Simulando usuário logado
-        User productOwner = userRepository.findUserByEmail("user2@email.com").get();
+        User productOwner = userRepository.findUserByEmail("user@email.com").get();
         Product product = productRequestDto.toModel(categoryRepository, productOwner);
         return ResponseEntity.ok(new ProductDto(productRepository.save(product)));
     }
