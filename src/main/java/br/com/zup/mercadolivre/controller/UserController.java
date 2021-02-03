@@ -21,7 +21,6 @@ public class UserController {
     @Autowired
     private PasswordEncoder encoder;
 
-
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid UserRequestDto userRequestDto) {
         User response = repository.save(userRequestDto.toModel(encoder));
