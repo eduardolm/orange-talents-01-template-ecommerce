@@ -20,7 +20,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = true)
@@ -61,7 +61,7 @@ public class Product {
                 .collect(Collectors.toSet());
         this.characteristics.addAll(newCharacteristics);
 
-        Assert.isTrue(this.characteristics.size() >= 3, "Todo produto precisa ter no mínimo 3 catacterísticas.");
+        Assert.isTrue(this.characteristics.size() >= 3, "Todo produto precisa ter no mínimo 3 características.");
     }
 
     @Deprecated
@@ -112,7 +112,7 @@ public class Product {
                 ", Preço:" + price +
                 ", Categoria:" + category +
                 ", DonoProduto:" + productOwner +
-                ", Características:" + characteristics +
+                ", Características:" + getCharacteristics().stream().collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription)) +
                 '}';
     }
 

@@ -21,7 +21,6 @@ public class ProductDetailDto {
     private Set<ProductCharacteristicsDto> characteristics;
 
     public ProductDetailDto(Product product) {
-        List<ProductCharacteristicsDto> tempList = new ArrayList<>();
         this.id = product.getId();
         this.name = product.getName();
         this.quantity = product.getQuantity();

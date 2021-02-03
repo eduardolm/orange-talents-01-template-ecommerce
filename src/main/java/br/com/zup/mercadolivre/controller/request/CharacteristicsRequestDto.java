@@ -35,6 +35,24 @@ public class CharacteristicsRequestDto {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof CharacteristicsRequestDto)) return false;
+
+        CharacteristicsRequestDto that = (CharacteristicsRequestDto) obj;
+
+        if (!getName().equals(that.getName())) return false;
+        return getDescription().equals(that.getDescription());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getName().hashCode();
+        result = 31 * result + getDescription().hashCode();
+        return result;
+    }
+
     public ProductCharacteristics toModel(Product product) {
         return new ProductCharacteristics(name, description, product);
     }

@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,7 @@ public class ProductController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<?> create(@RequestBody @Valid ProductRequestDto productRequestDto) {
         // Simulando usuário logado
         User productOwner = userRepository.findUserByEmail("user@email.com").get();

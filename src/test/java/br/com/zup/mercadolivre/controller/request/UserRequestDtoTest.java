@@ -87,16 +87,5 @@ public class UserRequestDtoTest {
         assertEquals(1, validator.validate(userRequestDto).size());
         assertTrue(userRequestDto instanceof UserRequestDto);
     }
-
-    @Test
-    public void shouldReturnValidationErrorIfPasswordLengthIsTooLong() {
-        UserRequestDto userRequestDto = new UserRequestDtoBuilder()
-                .withEmail("user@email.com")
-                .withPassword("pass1pass1pass1pass1pass1pass1pass1pass1pass1pass1pass1")
-                .build();
-
-        assertEquals(1, validator.validate(userRequestDto).size());
-        assertTrue(userRequestDto instanceof UserRequestDto);
-    }
 }
 

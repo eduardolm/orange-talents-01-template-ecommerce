@@ -5,7 +5,6 @@ import br.com.zup.mercadolivre.model.ProductCharacteristics;
 
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ProductDto {
@@ -31,8 +30,9 @@ public class ProductDto {
         this.price = product.getPrice();
         this.category = product.getCategory().getName();
         this.productOwner = product.getProductOwner().getEmail();
-//        this.characteristics = product.getCharacteristics().stream().map(item -> new ProductCharacteristicsDto(item).getName()).collect(Collectors.toSet());
-        this.characteristics = product.getCharacteristics().stream().collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription));
+        this.characteristics = product.getCharacteristics()
+                .stream()
+                .collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription));
     }
 
     public Long getId() {
