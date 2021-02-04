@@ -43,6 +43,7 @@ public class Product {
     private Set<ProductCharacteristics> characteristics = new HashSet<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<ProductImage> images = new HashSet<>();
 
     public Product(String name,
@@ -105,18 +106,27 @@ public class Product {
         return characteristics;
     }
 
+    public Set<ProductImage> getImages() {
+        return images;
+    }
+
+    public void setImages(Set<ProductImage> images) {
+        this.images = images;
+    }
+
     @Override
     public String toString() {
-        return "Product{" +
-                "Id" + id +
-                ", Nome:'" + name + '\'' +
+        return "Produto{" +
+                "Id:" + id +
+                ", nome:'" + name + '\'' +
                 ", Quantidade:" + quantity +
                 ", Descrição:'" + description + '\'' +
                 ", Preço:" + price +
                 ", Categoria:" + category +
-                ", DonoProduto:" + productOwner +
+                ", Proprietário:" + productOwner +
                 ", Características:" + getCharacteristics().stream()
                 .collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription)) +
+                ", Imagens:" + getImages().stream().collect(Collectors.toSet()) +
                 '}';
     }
 
@@ -151,5 +161,9 @@ public class Product {
                 .collect(Collectors.toSet());
 
         this.images.addAll(images);
+    }
+
+    public boolean belongsToUser(User tempOwner) {
+        return this.productOwner.equals(tempOwner);
     }
 }

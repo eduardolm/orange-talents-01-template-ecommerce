@@ -17,18 +17,18 @@ public class FileService {
         return convFile;
     }
 
-    public byte[] getObjectFile(String path) throws FileNotFoundException {
+    public byte[] getObjectFile(File file) throws FileNotFoundException {
 
-        return readBytesFromFile(path);
+        return readBytesFromFile(file);
     }
 
-    private byte[] readBytesFromFile(String filePath) {
+    private byte[] readBytesFromFile(File file) {
 
         FileInputStream fileInputStream = null;
         byte[] bytesArray = null;
 
         try {
-            File file = new File(filePath);
+//            File file = new File(file);
             bytesArray = new byte[(int) file.length()];
 
             //read file into bytes[]

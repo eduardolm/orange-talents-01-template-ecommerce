@@ -20,7 +20,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProductImageService {
@@ -34,39 +36,29 @@ public class ProductImageService {
     @Autowired
     private FileService fileService;
 
-    @Value("${file.path}")
-    private String filePath;
-
     @Value("${AWS_BUCKET_URL}")
     private String bucketUrl;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductImageService.class);
 
-    public void createImage(ProductImageRequestDto requestDto, Product product) throws IOException {
-        ProductImage productImage = new ProductImage();
+    public Set<String> uploadImage(ProductImageRequestDto requestDto, Product product) throws IOException {
 
+        Set<String> links = new HashSet<>();
         try {
             for (MultipartFile image : requestDto.getImages()) {
                 File file = fileService.convertMultiPartToFile(image);
 
-                String imageAddress = this.uploadFileToS3Bucket(
-                        this.createBucket(),
-                        file,
-                        this.filePath,
-                        product);
+                String imageAddress = bucketUrl + this.uploadFileToS3Bucket(this.createBucket(), file, product);
 
-                productImage.setLink(bucketUrl + imageAddress);
-//                imageRepository.save(productImage);
+                ProductImage productImage = new ProductImage(product, imageAddress);
+                links.add(imageAddress);
+                imageRepository.save(productImage);
             }
         }
         catch (IOException ex) {
             LOGGER.error("Erro ao enviar arquivo para a nuvem", ex);
         }
-
-
-        // TODO: Acertar como vincular o produto e usuário ao arquivo a ser enviado.
-
-
+        return links;
     }
 
     public String createBucket(){
@@ -79,8 +71,7 @@ public class ProductImageService {
         return bucketList.get(0);
     }
 
-    public String uploadFileToS3Bucket(String bucketName, File file, String filePath,
-                                       Product product) throws FileNotFoundException {
+    public String uploadFileToS3Bucket(String bucketName, File file, Product product) throws FileNotFoundException {
 
         final String uniqueFileName = LocalDateTime.now() + "_" + file.getName();
         LOGGER.info("Uploading file with name= " + uniqueFileName);
@@ -89,8 +80,8 @@ public class ProductImageService {
                         .bucket(bucketName)
                         .key(key)
                         .build(),
-                RequestBody.fromBytes(fileService.getObjectFile(filePath)));
-        return bucketName + key;
+                RequestBody.fromBytes(fileService.getObjectFile(file)));
+        return key;
     }
 
     public void listBuckets() {
