@@ -1,13 +1,17 @@
 package br.com.zup.mercadolivre.controller;
 
+import br.com.zup.mercadolivre.controller.request.ProductImageRequestDto;
 import br.com.zup.mercadolivre.controller.request.ProductRequestDto;
 import br.com.zup.mercadolivre.dto.ProductDetailDto;
 import br.com.zup.mercadolivre.dto.ProductDto;
+import br.com.zup.mercadolivre.handler.BucketHandler;
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
+import br.com.zup.mercadolivre.repository.ProductImageRepository;
 import br.com.zup.mercadolivre.repository.ProductRepository;
 import br.com.zup.mercadolivre.repository.UserRepository;
+import br.com.zup.mercadolivre.service.ProductImageService;
 import br.com.zup.mercadolivre.validator.SameNameCharacteristicsValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,7 +38,13 @@ public class ProductController {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @InitBinder
+    @Autowired
+    private ProductImageRepository imageRepository;
+
+    @Autowired
+    private ProductImageService imageService;
+
+    @InitBinder(value = "productRequestDto")
     public void init(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(new SameNameCharacteristicsValidator());
     }
@@ -60,5 +71,20 @@ public class ProductController {
             return ResponseEntity.ok().body(new ProductDetailDto(product.get()));
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("{id}/images")
+    public void upload(@PathVariable("id") Long id, @Valid ProductImageRequestDto requestDto) throws IOException {
+
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent()) {
+            imageService.createImage(requestDto, product.get());
+        }
+    }
+
+    @GetMapping("{id}/image/list")
+    public ResponseEntity<?> listBuckets() {
+        imageService.listBuckets();
+        return ResponseEntity.ok().build();
     }
 }

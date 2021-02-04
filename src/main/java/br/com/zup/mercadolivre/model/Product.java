@@ -42,6 +42,9 @@ public class Product {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<ProductCharacteristics> characteristics = new HashSet<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
+    private Set<ProductImage> images = new HashSet<>();
+
     public Product(String name,
                    Integer quantity,
                    String description,
@@ -112,7 +115,8 @@ public class Product {
                 ", Preço:" + price +
                 ", Categoria:" + category +
                 ", DonoProduto:" + productOwner +
-                ", Características:" + getCharacteristics().stream().collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription)) +
+                ", Características:" + getCharacteristics().stream()
+                .collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription)) +
                 '}';
     }
 
@@ -139,5 +143,13 @@ public class Product {
         result = 31 * result + getPrice().hashCode();
         result = 31 * result + getProductOwner().hashCode();
         return result;
+    }
+
+    public void associateImages(Set<String> links) {
+        Set<ProductImage> images = links.stream()
+                .map(link -> new ProductImage(this, link))
+                .collect(Collectors.toSet());
+
+        this.images.addAll(images);
     }
 }
