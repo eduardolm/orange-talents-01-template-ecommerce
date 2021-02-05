@@ -10,7 +10,7 @@ public class ProductCharacteristicsTest {
     @Test
     public void testToString() {
         // Arrange, Act and Assert
-        assertEquals("ProductCharacteristics{Id:null, Nome:'null', Descrição:'null', Produto:null}",
+        assertEquals("ProductCharacteristics{Id:null, Nome:'null', Descrição:'null'}",
                 (new ProductCharacteristics()).toString());
     }
 

@@ -5,12 +5,9 @@ import br.com.zup.mercadolivre.model.ProductReview;
 import br.com.zup.mercadolivre.model.User;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.*;
-import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 public class ProductReviewRequestDto {
 
@@ -24,14 +21,6 @@ public class ProductReviewRequestDto {
     @NotBlank(message = "A descrição é obrigatória.")
     @Length(max = 500, message = "O tamanho máximo da descrição é de 500 caracteres.")
     private String description;
-
-    @NotNull(message = "O produto é obrigatório.")
-    @Valid
-    private Product product;
-
-    @NotNull(message = "Usuário é obrigatório.")
-    @Valid
-    private User customer;
 
     public ProductReviewRequestDto(
             @Min(value = 1, message = "O valor mínimo é 1.")

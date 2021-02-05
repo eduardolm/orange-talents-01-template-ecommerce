@@ -1,7 +1,6 @@
 package br.com.zup.mercadolivre.model;
 
 import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
-import br.com.zup.mercadolivre.dto.ProductCharacteristicsDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.lang.Assert;
@@ -9,7 +8,9 @@ import io.jsonwebtoken.lang.Assert;
 import javax.persistence.*;
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -113,6 +114,10 @@ public class Product {
         return images;
     }
 
+    public Set<ProductReview> getProductReviews() {
+        return productReviews;
+    }
+
     public void setImages(Set<ProductImage> images) {
         this.images = images;
     }
@@ -120,8 +125,8 @@ public class Product {
     @Override
     public String toString() {
         return "Produto{" +
-                "Id:" + id +
-                ", nome:'" + name + '\'' +
+                "Id=" + id +
+                ", Nome:'" + name + '\'' +
                 ", Quantidade:" + quantity +
                 ", Descrição:'" + description + '\'' +
                 ", Preço:" + price +
@@ -130,6 +135,7 @@ public class Product {
                 ", Características:" + getCharacteristics().stream()
                 .collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription)) +
                 ", Imagens:" + getImages().stream().collect(Collectors.toSet()) +
+                ", Opiniões:" + getProductReviews().stream().collect(Collectors.toSet()) +
                 '}';
     }
 

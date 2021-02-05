@@ -19,6 +19,7 @@ public class ProductDetailDto {
     private UserDto productOwner;
     private Set<ProductCharacteristicsDto> characteristics;
     private Set<String> images;
+    private Set<ProductReviewDto> reviews;
 
     public ProductDetailDto(Product product) {
         this.id = product.getId();
@@ -30,6 +31,7 @@ public class ProductDetailDto {
         this.productOwner = new UserDto(product.getProductOwner());
         this.characteristics = product.getCharacteristics().stream().map(ProductCharacteristicsDto::new).collect(Collectors.toSet());
         this.images = product.getImages().stream().map(ProductImage::getLink).collect(Collectors.toSet());
+        this.reviews = product.getProductReviews().stream().map(ProductReviewDto::new).collect(Collectors.toSet());
     }
 
     public Long getId() {
@@ -62,6 +64,10 @@ public class ProductDetailDto {
 
     public Set<ProductCharacteristicsDto> getCharacteristics() {
         return characteristics;
+    }
+
+    public Set<ProductReviewDto> getReviews() {
+        return reviews;
     }
 
     public Set<String> getImages() {

@@ -8,7 +8,6 @@ import br.com.zup.mercadolivre.dto.ProductDto;
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
-import br.com.zup.mercadolivre.repository.ProductImageRepository;
 import br.com.zup.mercadolivre.repository.ProductRepository;
 import br.com.zup.mercadolivre.repository.UserRepository;
 import br.com.zup.mercadolivre.service.ProductImageService;
@@ -17,7 +16,6 @@ import io.jsonwebtoken.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -127,5 +125,4 @@ public class ProductController {
     private String getAuthenticatedUser() {
         return authenticationFacade.getAuthentication().getName();
     }
-
 }
