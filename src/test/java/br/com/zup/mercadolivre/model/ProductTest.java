@@ -58,7 +58,7 @@ public class ProductTest {
     @ParameterizedTest
     @MethodSource("generatorTest1")
     public void test1(Collection<CharacteristicsRequestDto> characteristics) throws Exception {
-        User owner = new User("email@emil.com", "pass1234");
+        User owner = new User("email@email.com", "pass1234");
         new Product("Test Product", 10, "Description", BigDecimal.TEN, category, owner, characteristics);
     }
 

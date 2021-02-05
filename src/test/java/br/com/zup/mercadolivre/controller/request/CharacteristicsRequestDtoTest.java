@@ -22,9 +22,10 @@ public class CharacteristicsRequestDtoTest {
 
         assertEquals("Name", actualToModelResult.getName());
         assertEquals("The characteristics of someone or something", actualToModelResult.getDescription());
-        assertEquals("ProductCharacteristics{Id:null, Nome:'Name', Descrição:'The characteristics of someone or something',"
-                + " Produto:Product{Idnull, Nome:'null', Quantidade:null, Descrição:'null', Preço:null, Categoria:null,"
-                + " DonoProduto:null, Características:{}}}", actualToModelResult.toString());
+        assertEquals("ProductCharacteristics{Id:null, Nome:'Name', Descrição:'The characteristics of " +
+                "someone or something', Produto:Produto{Id:null, nome:'null', Quantidade:null, Descrição:'null', " +
+                "Preço:null, Categoria:null, Proprietário:null, Características:{}, Imagens:[]}}",
+                actualToModelResult.toString());
     }
 
     @Test

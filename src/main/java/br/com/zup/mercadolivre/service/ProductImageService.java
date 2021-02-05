@@ -84,10 +84,9 @@ public class ProductImageService {
         return key;
     }
 
+    // TODO: apenas para testes. Remover antes de finalizar
     public void listBuckets() {
         bucket.listBucketObjects(bucket.getS3(), "mercadolivre-bucket1612446310284");
         bucket.deleteAllBucketObjects("mercadolivre-bucket1612446310284");
     }
-
-
 }

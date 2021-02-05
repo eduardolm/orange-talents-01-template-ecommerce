@@ -4,14 +4,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProductImageRequestDto {
 
     @Size(min = 1, message = "Obrigatório enviar pelo menos uma imagem do produto.")
-    @NotNull(message = "Item orbigatório.")
-    private List<MultipartFile> images = new ArrayList<>();
+    @NotNull(message = "Item obrigatório.")
+    private List<MultipartFile> images;
 
     public ProductImageRequestDto(
             @Size(min = 1, message = "Obrigatório enviar pelo menos uma imagem do produto.")

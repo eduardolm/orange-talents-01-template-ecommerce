@@ -129,8 +129,4 @@ public class BucketHandler {
     public S3Client getS3() {
         return s3;
     }
-
-    public void setS3(S3Client s3) {
-        this.s3 = s3;
-    }
 }
