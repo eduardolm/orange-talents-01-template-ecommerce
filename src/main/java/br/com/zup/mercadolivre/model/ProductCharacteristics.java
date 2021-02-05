@@ -58,7 +58,6 @@ public class ProductCharacteristics {
                 "Id:" + id +
                 ", Nome:'" + name + '\'' +
                 ", Descrição:'" + description + '\'' +
-                ", Produto:" + product +
                 '}';
     }
 

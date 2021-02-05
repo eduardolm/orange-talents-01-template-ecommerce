@@ -42,9 +42,12 @@ public class Product {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<ProductCharacteristics> characteristics = new HashSet<>();
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<ProductImage> images = new HashSet<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
+    private Set<ProductReview> productReviews = new HashSet<>();
 
     public Product(String name,
                    Integer quantity,
@@ -155,7 +158,7 @@ public class Product {
         return result;
     }
 
-    public void associateImages(Set<String> links) {
+    public void addImages(Set<String> links) {
         Set<ProductImage> images = links.stream()
                 .map(link -> new ProductImage(this, link))
                 .collect(Collectors.toSet());

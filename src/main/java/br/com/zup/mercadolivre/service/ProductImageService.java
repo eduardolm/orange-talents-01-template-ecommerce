@@ -5,12 +5,17 @@ import br.com.zup.mercadolivre.handler.BucketHandler;
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.ProductImage;
 import br.com.zup.mercadolivre.repository.ProductImageRepository;
+import io.jsonwebtoken.lang.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -43,15 +48,19 @@ public class ProductImageService {
 
     public Set<String> uploadImage(ProductImageRequestDto requestDto, Product product) throws IOException {
 
+        JSONObject response = new JSONObject();
         Set<String> links = new HashSet<>();
         try {
             for (MultipartFile image : requestDto.getImages()) {
                 File file = fileService.convertMultiPartToFile(image);
 
+                if (preventRepeatedImages(file)) return null;
+
                 String imageAddress = bucketUrl + this.uploadFileToS3Bucket(this.createBucket(), file, product);
 
                 ProductImage productImage = new ProductImage(product, imageAddress);
                 links.add(imageAddress);
+                productImage.setOriginalFileName(file.getName());
                 imageRepository.save(productImage);
             }
         }
@@ -59,6 +68,10 @@ public class ProductImageService {
             LOGGER.error("Erro ao enviar arquivo para a nuvem", ex);
         }
         return links;
+    }
+
+    private boolean preventRepeatedImages(File file) {
+        return imageRepository.findByOriginalFileName(file.getName()).getOriginalFileName().equals(file.getName());
     }
 
     public String createBucket(){
