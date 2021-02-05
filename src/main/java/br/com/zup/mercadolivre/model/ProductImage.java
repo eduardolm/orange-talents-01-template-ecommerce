@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
+@Table(name = "imagens_produtos")
 public class ProductImage {
 
     @Id
