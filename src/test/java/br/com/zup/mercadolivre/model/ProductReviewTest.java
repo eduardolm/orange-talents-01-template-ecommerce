@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -72,8 +73,19 @@ public class ProductReviewTest {
 
     @Test
     public void shouldOverloadedConstructorCreateProductReviewInstance() {
-        ProductReview productReview = new ProductReview(3, "Bom produto", "Produto atende as expectativas", product, user);
+        ProductReview productReview = new ProductReview(3, "Bom produto", "Produto atende as " +
+                "expectativas", product, user);
 
         assertTrue(productReview instanceof ProductReview);
+    }
+
+    @Test
+    public void shouldGettersWorkAsExpected() {
+        ProductReview productReview = new ProductReview(3, "Bom produto", "Produto atende as " +
+                "expectativas", product, user);
+
+        assertEquals(3, productReview.getGrade());
+        assertEquals("Bom produto", productReview.getTitle());
+        assertEquals("Produto atende as expectativas", productReview.getDescription());
     }
 }

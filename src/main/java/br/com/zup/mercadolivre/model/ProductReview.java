@@ -25,11 +25,9 @@ public class ProductReview {
     private String description;
 
     @ManyToOne
-    @Column(nullable = false)
     private Product product;
 
     @ManyToOne
-    @Column(nullable = false)
     private User customer;
 
     public ProductReview(Integer grade, String title, String description, Product product, User customer) {
@@ -42,6 +40,10 @@ public class ProductReview {
 
     @Deprecated
     public ProductReview() {}
+
+    public Integer getGrade() {
+        return grade;
+    }
 
     public String getTitle() {
         return title;
