@@ -57,6 +57,10 @@ public class ProductQuestion implements Comparable<ProductQuestion> {
         return interested;
     }
 
+    public User getProductOwner() {
+        return product.getProductOwner();
+    }
+
     public Product getProduct() {
         return product;
     }

@@ -7,6 +7,7 @@ import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.ProductQuestion;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.ProductQuestionRepository;
+import br.com.zup.mercadolivre.service.EmailMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,9 @@ public class ProductQuestionController extends ObjectHandler {
     @Autowired
     private ProductQuestionRepository repository;
 
+    @Autowired
+    private EmailMessages email;
+
     @PostMapping("{id}/questions")
     @Transactional
     public ResponseEntity<?> create(@PathVariable("id") Long id,
@@ -28,8 +32,12 @@ public class ProductQuestionController extends ObjectHandler {
 
         User loggedUser = checkUserExists();
         Product product = checkProductExists(id);
-        ProductQuestion newProductQuestion = repository.save(productQuestionRequestDto.toModel(loggedUser, product));
-        return ResponseEntity.ok().body(new ProductQuestionDto(newProductQuestion));
+        ProductQuestion productQuestion = repository.save(productQuestionRequestDto.toModel(loggedUser, product));
+
+        email.question(productQuestion);
+
+
+        return ResponseEntity.ok().body(new ProductQuestionDto(productQuestion));
     }
 
 }
