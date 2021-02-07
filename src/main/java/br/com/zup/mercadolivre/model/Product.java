@@ -1,6 +1,8 @@
 package br.com.zup.mercadolivre.model;
 
 import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
+import br.com.zup.mercadolivre.dto.ProductCharacteristicsDto;
+import br.com.zup.mercadolivre.dto.ProductReviewDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.lang.Assert;
@@ -183,8 +185,29 @@ public class Product {
         return this.productOwner.equals(tempOwner);
     }
 
-    public <T extends Comparable<T>> SortedSet<T> mapProductQuestions(Function<ProductQuestion, T> mapperFunction) {
+    public <T extends Comparable<T>> SortedSet<T> mapQuestions(Function<ProductQuestion, T> mapperFunction) {
         return this.questions.stream().map(mapperFunction)
-                .collect(Collectors.toCollection(TreeSet :: new));
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    public <T> Set<T> mapCharacteristics(Function<ProductCharacteristics, T> mapperFunction) {
+        return this.characteristics
+                .stream()
+                .map(mapperFunction)
+                .collect(Collectors.toSet());
+    }
+
+    public <T> Set<T> mapImages(Function<ProductImage, T> mapperFunction) {
+        return this.images
+                .stream()
+                .map(mapperFunction)
+                .collect(Collectors.toSet());
+    }
+
+    public <T> Set<T> mapReviews(Function<ProductReview, T> mapperFunction) {
+        return this.productReviews
+                .stream()
+                .map(mapperFunction)
+                .collect(Collectors.toSet());
     }
 }

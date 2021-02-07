@@ -1,15 +1,13 @@
 package br.com.zup.mercadolivre.dto;
 
-import br.com.zup.mercadolivre.model.Category;
-import br.com.zup.mercadolivre.model.Product;
-import br.com.zup.mercadolivre.model.ProductImage;
-import br.com.zup.mercadolivre.model.ProductQuestion;
+import br.com.zup.mercadolivre.model.*;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ProductDetailDto {
 
@@ -23,7 +21,8 @@ public class ProductDetailDto {
     private Set<ProductCharacteristicsDto> characteristics;
     private Set<String> images;
     private SortedSet<String> questions;
-    private Set<ProductReviewDto> reviews;
+    private Set<Map<String, String>> reviews;
+    private double averageGrade;
 
     public ProductDetailDto(Product product) {
         this.id = product.getId();
@@ -33,10 +32,16 @@ public class ProductDetailDto {
         this.price = product.getPrice();
         this.category = product.getCategory();
         this.productOwner = new UserDto(product.getProductOwner());
-        this.characteristics = product.getCharacteristics().stream().map(ProductCharacteristicsDto::new).collect(Collectors.toSet());
-        this.images = product.getImages().stream().map(ProductImage::getLink).collect(Collectors.toSet());
-        this.questions = product.mapProductQuestions(ProductQuestion::getTitle);
-        this.reviews = product.getProductReviews().stream().map(ProductReviewDto::new).collect(Collectors.toSet());
+        this.characteristics = product.mapCharacteristics(ProductCharacteristicsDto::new);
+        this.images = product.mapImages(ProductImage::getLink);
+        this.questions = product.mapQuestions(ProductQuestion::getTitle);
+        this.reviews = product.mapReviews(productReview ->
+                Map.of("title", productReview.getTitle(),
+                        "description", productReview.getDescription()));
+
+        Set<Integer> grades = product.mapReviews(ProductReview::getGrade);
+        OptionalDouble tempAverage = grades.stream().mapToInt(grade -> grade).average();
+        this.averageGrade = tempAverage.orElse(0.0);
     }
 
     public Long getId() {
@@ -71,7 +76,7 @@ public class ProductDetailDto {
         return characteristics;
     }
 
-    public Set<ProductReviewDto> getReviews() {
+    public Set<Map<String, String>> getReviews() {
         return reviews;
     }
 
@@ -81,5 +86,9 @@ public class ProductDetailDto {
 
     public Set<String> getImages() {
         return images;
+    }
+
+    public double getAverageGrade() {
+        return averageGrade;
     }
 }
