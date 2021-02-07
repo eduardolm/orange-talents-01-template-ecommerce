@@ -36,7 +36,6 @@ public class ProductQuestionController extends ObjectHandler {
 
         email.question(productQuestion);
 
-
         return ResponseEntity.ok().body(new ProductQuestionDto(productQuestion));
     }
 

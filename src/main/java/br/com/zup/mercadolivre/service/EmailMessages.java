@@ -19,9 +19,8 @@ public class EmailMessages {
                 productQuestion.getProductOwner().getEmail(),
                 EmailFrom.QUESTION.label,
                 "Nova pergunta...",
-                "Você recebeu uma nova pergunta no produto: " + productQuestion.getProduct().getName() +
-                        "\nPergunta: " + productQuestion.getTitle() +
-                        "\nResponda rápido para aumentar as chances de fechar negócio! " +
+                "Você recebeu uma nova pergunta no produto: " + productQuestion.getProduct().getName() + "\n" +
+                        "\nResponda rápido para aumentar as chances de fechar negócio! " + "\n" +
                         "\nPergunta: " + productQuestion.getTitle());
     }
 

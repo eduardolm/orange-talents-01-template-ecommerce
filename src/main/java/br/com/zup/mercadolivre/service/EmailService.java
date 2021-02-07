@@ -4,6 +4,7 @@ import br.com.zup.mercadolivre.controller.ProductQuestionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,6 +15,7 @@ public class EmailService implements IEmailService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductQuestionController.class);
 
+    @Qualifier("getJavaMailSender")
     @Autowired
     private JavaMailSender emailSender;
 
