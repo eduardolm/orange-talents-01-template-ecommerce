@@ -1,8 +1,6 @@
 package br.com.zup.mercadolivre.model;
 
 import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
-import br.com.zup.mercadolivre.dto.ProductCharacteristicsDto;
-import br.com.zup.mercadolivre.dto.ProductReviewDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.lang.Assert;
@@ -123,10 +121,6 @@ public class Product {
         return questions;
     }
 
-    public Set<ProductReview> getProductReviews() {
-        return productReviews;
-    }
-
     public void setImages(Set<ProductImage> images) {
         this.images = images;
     }
@@ -144,7 +138,6 @@ public class Product {
                 ", Características:" + getCharacteristics().stream()
                 .collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription)) +
                 ", Imagens:" + getImages().stream().collect(Collectors.toSet()) +
-                ", Opiniões:" + getProductReviews().stream().collect(Collectors.toSet()) +
                 '}';
     }
 
@@ -204,10 +197,7 @@ public class Product {
                 .collect(Collectors.toSet());
     }
 
-    public <T> Set<T> mapReviews(Function<ProductReview, T> mapperFunction) {
-        return this.productReviews
-                .stream()
-                .map(mapperFunction)
-                .collect(Collectors.toSet());
+    public Reviews getReviews() {
+        return new Reviews(this.productReviews);
     }
 }

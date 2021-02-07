@@ -4,10 +4,8 @@ import br.com.zup.mercadolivre.model.*;
 
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.stream.IntStream;
 
 public class ProductDetailDto {
 
@@ -23,6 +21,7 @@ public class ProductDetailDto {
     private SortedSet<String> questions;
     private Set<Map<String, String>> reviews;
     private double averageGrade;
+    private int total;
 
     public ProductDetailDto(Product product) {
         this.id = product.getId();
@@ -35,13 +34,15 @@ public class ProductDetailDto {
         this.characteristics = product.mapCharacteristics(ProductCharacteristicsDto::new);
         this.images = product.mapImages(ProductImage::getLink);
         this.questions = product.mapQuestions(ProductQuestion::getTitle);
-        this.reviews = product.mapReviews(productReview ->
+
+
+        Reviews reviews = product.getReviews();
+        this.reviews = reviews.mapReviews(productReview ->
                 Map.of("title", productReview.getTitle(),
                         "description", productReview.getDescription()));
 
-        Set<Integer> grades = product.mapReviews(ProductReview::getGrade);
-        OptionalDouble tempAverage = grades.stream().mapToInt(grade -> grade).average();
-        this.averageGrade = tempAverage.orElse(0.0);
+        this.averageGrade = reviews.average();
+        this.total = reviews.total();
     }
 
     public Long getId() {
@@ -90,5 +91,9 @@ public class ProductDetailDto {
 
     public double getAverageGrade() {
         return averageGrade;
+    }
+
+    public int getTotal() {
+        return total;
     }
 }
