@@ -7,6 +7,7 @@ import io.jsonwebtoken.lang.Assert;
 
 import javax.persistence.*;
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
@@ -199,5 +200,16 @@ public class Product {
 
     public Reviews getReviews() {
         return new Reviews(this.productReviews);
+    }
+
+    public boolean subtractStock(@Positive int quantity) {
+        Assert.isTrue(quantity > 0, "A quantidade deve ser maior que zero para que a compra " +
+                "possa ser realizada: " + quantity);
+
+        if (quantity <= this.quantity) {
+            this.quantity -= quantity;
+            return true;
+        }
+        return false;
     }
 }

@@ -26,7 +26,7 @@ public class EmailMessages {
 
     public void purchase(Purchase purchase) {
         emailService.send(
-                purchase.getProductOwner(),
+                purchase.getProduct().getProductOwner().getEmail(),
                 EmailFrom.PURCHASE.label ,
                 "Nova compra...",
                 "Você tem uma nova compra: " + purchase + " !" +
