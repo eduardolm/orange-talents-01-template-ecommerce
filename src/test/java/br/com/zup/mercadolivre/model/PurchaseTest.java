@@ -1,6 +1,11 @@
 package br.com.zup.mercadolivre.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
 import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
+import br.com.zup.mercadolivre.enums.PaymentGateway;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
 import br.com.zup.mercadolivre.utils.builder.ProductBuilder;
 import org.assertj.core.util.Lists;
@@ -8,23 +13,21 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.validation.Validator;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class ProductReviewTest {
+public class PurchaseTest {
 
     @MockBean
     private CategoryRepository categoryRepository;
@@ -33,6 +36,9 @@ public class ProductReviewTest {
     private Category category;
     private Product product;
     private Collection<CharacteristicsRequestDto> characteristics;
+
+    @Autowired
+    private Validator validator;
 
     @BeforeEach
     public void setup() {
@@ -63,6 +69,7 @@ public class ProductReviewTest {
                         new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
+        this.product.setId(1L);
     }
 
     @AfterEach
@@ -71,27 +78,18 @@ public class ProductReviewTest {
     }
 
     @Test
-    public void shouldCreateNewProductReviewInstance() {
-        ProductReview productReview = new ProductReview();
-
-        assertTrue(productReview instanceof ProductReview);
+    public void testToString() {
+        assertEquals("Purchase{Id:null, Produto:null, Quantidade:0, Comprador:null, Pagamento:null}",
+                (new Purchase()).toString());
     }
 
     @Test
-    public void shouldOverloadedConstructorCreateProductReviewInstance() {
-        ProductReview productReview = new ProductReview(3, "Bom produto", "Produto atende as " +
-                "expectativas", product, user);
+    public void shouldCreateNewPurchaseInstance() {
+        Purchase purchase = new Purchase(this.product, 10, this.user, PaymentGateway.PAYPAL);
 
-        assertTrue(productReview instanceof ProductReview);
-    }
-
-    @Test
-    public void shouldGettersWorkAsExpected() {
-        ProductReview productReview = new ProductReview(3, "Bom produto", "Produto atende as " +
-                "expectativas", product, user);
-
-        assertEquals(3, productReview.getGrade());
-        assertEquals("Bom produto", productReview.getTitle());
-        assertEquals("Produto atende as expectativas", productReview.getDescription());
+        assertTrue(purchase instanceof Purchase);
+        assertEquals("Galaxy S20", purchase.getProduct().getName());
+        assertEquals(new BigDecimal( "2000"), purchase.getProduct().getPrice());
     }
 }
+

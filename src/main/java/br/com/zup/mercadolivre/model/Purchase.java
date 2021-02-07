@@ -1,5 +1,8 @@
 package br.com.zup.mercadolivre.model;
 
+import br.com.zup.mercadolivre.enums.PaymentGateway;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import javax.persistence.*;
 
 @Entity
@@ -19,10 +22,15 @@ public class Purchase {
     @ManyToOne
     private User customer;
 
-    public Purchase(Product product, int quantity, User customer) {
+    @Enumerated
+    @Column(nullable = false)
+    private PaymentGateway paymentGateway;
+
+    public Purchase(Product product, int quantity, User customer, PaymentGateway paymentGateway) {
         this.product = product;
         this.quantity = quantity;
         this.customer = customer;
+        this.paymentGateway = paymentGateway;
     }
 
     @Deprecated
@@ -33,10 +41,15 @@ public class Purchase {
     public String toString() {
         return "Purchase{" +
                 "Id:" + id +
-                ", Produto:" + product.getName() +
+                ", Produto:" + product +
                 ", Quantidade:" + quantity +
-                ", Comprador:" + customer.getEmail() +
+                ", Comprador:" + customer +
+                ", Pagamento:" + paymentGateway +
                 '}';
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Product getProduct() {
@@ -49,5 +62,13 @@ public class Purchase {
 
     public User getCustomer() {
         return customer;
+    }
+
+    public PaymentGateway getPaymentGateway() {
+        return paymentGateway;
+    }
+
+    public String redirectUrl(UriComponentsBuilder uriComponentsBuilder) {
+        return this.paymentGateway.createRedirectUrl(this, uriComponentsBuilder);
     }
 }

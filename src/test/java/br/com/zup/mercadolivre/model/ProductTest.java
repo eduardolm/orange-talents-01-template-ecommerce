@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,26 +28,38 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.booleanThat;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 public class ProductTest {
-
     @MockBean
     private CategoryRepository categoryRepository;
 
     private User user;
     private Category category;
+    private Product product;
+    private Collection<CharacteristicsRequestDto> characteristics;
 
     @BeforeEach
     public void setup() {
+        // Create User
         this.user = new User("test@email.com", "pass1234");
+
+        // Create Category
         Category category = new Category("Celulares & Tablets");
         category.setId(1L);
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
         this.category = category;
+
+        // Create Characteristics
+        this.characteristics = Lists.newArrayList(
+                new CharacteristicsRequestDto("key", "value"),
+                new CharacteristicsRequestDto("key2", "value2"),
+                new CharacteristicsRequestDto("key3", "value3")
+        );
     }
 
     @AfterEach
@@ -82,7 +95,7 @@ public class ProductTest {
         User owner = new User("email@emil.com", "pass1234");
 
         assertThrows(IllegalArgumentException.class, () ->
-        new Product("Test Product", 10, "Description", BigDecimal.TEN, category, owner, characteristics));
+                new Product("Test Product", 10, "Description", BigDecimal.TEN, category, owner, characteristics));
     }
 
     static Stream<Arguments> generatorTest2() {
@@ -92,6 +105,48 @@ public class ProductTest {
                         new CharacteristicsRequestDto("key3", "value3"))),
                 Arguments.of(List.of(
                         new CharacteristicsRequestDto("key4", "value4"))));
+    }
+
+    @DisplayName("Checks product stock")
+    @ParameterizedTest
+    @CsvSource({"1,1,true", "1,2,false", "4,2,true", "1,5,false"})
+    public void test3(int stock, int orderedQuantity, boolean expectedResult) {
+        this.product = new ProductBuilder()
+                .withName("Galaxy S20")
+                .withQuantity(stock)
+                .withDescription("Celular top da categoria")
+                .withPrice(new BigDecimal("2000"))
+                .withCategory(new Category("Celulares & Tablets"))
+                .withCharacteristics(Lists.newArrayList(
+                        new CharacteristicsRequestDto("Peso", "145g"),
+                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
+                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
+                .build();
+
+        boolean actualResult = this.product.subtractStock(orderedQuantity);
+
+        assertEquals(expectedResult, actualResult);
+    }
+
+    @DisplayName("Should not accept negative values")
+    @ParameterizedTest
+    @CsvSource({"0", "-1", "-100"})
+    public void test4(int stock) throws Exception {
+        this.product = new ProductBuilder()
+                .withName("Galaxy S20")
+                .withQuantity(10)
+                .withDescription("Celular top da categoria")
+                .withPrice(new BigDecimal("2000"))
+                .withCategory(new Category("Celulares & Tablets"))
+                .withCharacteristics(Lists.newArrayList(
+                        new CharacteristicsRequestDto("Peso", "145g"),
+                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
+                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
+                .build();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            this.product.subtractStock(stock);
+        });
     }
 
     @Test
