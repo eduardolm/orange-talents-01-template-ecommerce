@@ -1,6 +1,6 @@
 package br.com.zup.mercadolivre.model;
 
-import br.com.zup.mercadolivre.controller.request.PagSeguroRequestDto;
+import br.com.zup.mercadolivre.controller.request.PaymentGatewayResponseDto;
 import br.com.zup.mercadolivre.enums.PaymentGateway;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -86,16 +86,29 @@ public class Purchase {
         return this.paymentGateway.createRedirectUrl(this, uriComponentsBuilder);
     }
 
-    public void addTransaction(@Valid PagSeguroRequestDto request) {
+    public void addTransaction(@Valid PaymentGatewayResponseDto request) {
         Transaction newTransaction = request.toTransaction(this);
         Assert.isTrue(!this.transactions.contains(newTransaction), "Essa transação já foi processada: " +
                 newTransaction.toString());
 
-        Set<Transaction> successfullyFinishedTransactions = this.transactions
-                .stream().filter(Transaction::finishedSuccessfully).collect(Collectors.toSet());
+        Set<Transaction> successfullyFinishedTransactions = successfullyFinishedTransactions();
 
         Assert.isTrue(successfullyFinishedTransactions.isEmpty(), "Essa compra já foi concluída com sucesso.");
 
         this.transactions.add(newTransaction);
+    }
+
+    private Set<Transaction> successfullyFinishedTransactions() {
+        Set<Transaction> successfullyFinishedTransactions = this.transactions
+                .stream().filter(Transaction::finishedSuccessfully).collect(Collectors.toSet());
+
+        Assert.isTrue(successfullyFinishedTransactions.size() <= 1, "Existe mais de uma transação " +
+                "concluída com sucesso.");
+
+        return successfullyFinishedTransactions;
+    }
+
+    public boolean successfullyProcessed() {
+        return !successfullyFinishedTransactions().isEmpty();
     }
 }

@@ -1,7 +1,10 @@
 package br.com.zup.mercadolivre.controller;
 
 import br.com.zup.mercadolivre.controller.request.PagSeguroRequestDto;
+import br.com.zup.mercadolivre.controller.request.PaymentGatewayResponseDto;
+import br.com.zup.mercadolivre.controller.request.PaypalRequestDto;
 import br.com.zup.mercadolivre.model.Purchase;
+import br.com.zup.mercadolivre.model.PurchaseEvents;
 import br.com.zup.mercadolivre.repository.PurchaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,19 +23,34 @@ public class PaymentGatewayController {
     @Autowired
     private PurchaseRepository purchaseRepository;
 
-    @PostMapping("/api/v1/retorno-pagseguro/{id}")
-    public ResponseEntity<?> create(@PathVariable("id") Long id, @Valid @RequestBody PagSeguroRequestDto request) throws BindException {
+    @Autowired
+    private PurchaseEvents purchaseEvents;
 
-        Optional<Purchase> purchase = purchaseRepository.findById(id);
+    @PostMapping("/api/v1/retorno-pagseguro/{id}")
+    public ResponseEntity<?> processPagSeguro(@PathVariable("id") Long id,
+                                              @Valid @RequestBody PagSeguroRequestDto request) throws BindException {
+        return process(id, request);
+    }
+
+    @PostMapping("/api/v1/retorno-paypal/{id}")
+    public ResponseEntity<?> processPaypal(@PathVariable("id") Long id,
+                                           @Valid @RequestBody PaypalRequestDto request) throws BindException {
+
+        return process(id, request);
+    }
+
+    private ResponseEntity<?> process(Long purchaseId, PaymentGatewayResponseDto paymentGatewayResponseDto) throws BindException {
+        Optional<Purchase> purchase = purchaseRepository.findById(purchaseId);
 
         if (purchase.isPresent()) {
-            purchase.get().addTransaction(request);
+            purchase.get().addTransaction(paymentGatewayResponseDto);
             purchaseRepository.save(purchase.get());
+            purchaseEvents.process(purchase.get());
 
             return ResponseEntity.ok().body(purchase.toString());
         }
 
-        BindException purchaseIssue = new BindException(request, "pagSeguroRequestDto");
+        BindException purchaseIssue = new BindException(paymentGatewayResponseDto, "paymentGatewayResponseDto");
         purchaseIssue.reject(null, "Não foi possível completar a compra. Compra não encontrada");
         throw purchaseIssue;
     }
