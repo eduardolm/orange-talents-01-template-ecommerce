@@ -88,12 +88,13 @@ public class Purchase {
 
     public void addTransaction(@Valid PaymentGatewayResponseDto request) {
         Transaction newTransaction = request.toTransaction(this);
-        Assert.isTrue(!this.transactions.contains(newTransaction), "Essa transação já foi processada: " +
-                newTransaction.toString());
+
+        Assert.state(!this.transactions.contains(newTransaction), "Já existe uma transação igual a essa " +
+                "processada: " + newTransaction.toString());
 
         Set<Transaction> successfullyFinishedTransactions = successfullyFinishedTransactions();
 
-        Assert.isTrue(successfullyFinishedTransactions.isEmpty(), "Essa compra já foi concluída com sucesso.");
+        Assert.state(!this.successfullyProcessed(), "Essa compra já foi concluída com sucesso.");
 
         this.transactions.add(newTransaction);
     }

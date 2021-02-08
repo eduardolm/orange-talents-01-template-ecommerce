@@ -4,7 +4,7 @@ import br.com.zup.mercadolivre.controller.request.PagSeguroRequestDto;
 import br.com.zup.mercadolivre.controller.request.PaymentGatewayResponseDto;
 import br.com.zup.mercadolivre.controller.request.PaypalRequestDto;
 import br.com.zup.mercadolivre.model.Purchase;
-import br.com.zup.mercadolivre.model.PurchaseEvents;
+import br.com.zup.mercadolivre.service.PurchaseEvents;
 import br.com.zup.mercadolivre.repository.PurchaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

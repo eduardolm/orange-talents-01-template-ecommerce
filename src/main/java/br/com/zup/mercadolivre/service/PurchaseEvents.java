@@ -1,5 +1,6 @@
-package br.com.zup.mercadolivre.model;
+package br.com.zup.mercadolivre.service;
 
+import br.com.zup.mercadolivre.model.Purchase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,5 +19,13 @@ public class PurchaseEvents {
         else {
             // codigo
         }
+    }
+
+    public Set<PurchaseSuccessEvent> getPurchaseSuccessEvent() {
+        return purchaseSuccessEvent;
+    }
+
+    public void setPurchaseSuccessEvent(Set<PurchaseSuccessEvent> purchaseSuccessEvent) {
+        this.purchaseSuccessEvent = purchaseSuccessEvent;
     }
 }

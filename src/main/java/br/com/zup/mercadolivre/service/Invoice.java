@@ -1,5 +1,6 @@
-package br.com.zup.mercadolivre.model;
+package br.com.zup.mercadolivre.service;
 
+import br.com.zup.mercadolivre.model.Purchase;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
