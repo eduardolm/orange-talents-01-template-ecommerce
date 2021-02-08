@@ -1,12 +1,10 @@
 package br.com.zup.mercadolivre.model;
 
 import br.com.zup.mercadolivre.utils.builder.CategoryBuilder;
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class CategoryTest {
 

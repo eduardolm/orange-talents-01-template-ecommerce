@@ -1,18 +1,16 @@
 package br.com.zup.mercadolivre.handler;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-
-import java.net.URI;
-import java.nio.file.Paths;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+
+import java.net.URI;
+import java.nio.file.Paths;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = {BucketHandler.class})
 @ExtendWith(SpringExtension.class)

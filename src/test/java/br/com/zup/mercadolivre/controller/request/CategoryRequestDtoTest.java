@@ -2,8 +2,9 @@ package br.com.zup.mercadolivre.controller.request;
 
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,17 +19,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class CategoryRequestDtoTest {
 
     @Autowired
     private Validator validator;
 
     @Autowired
-    private CategoryRepository repository;
+    private CategoryRepository categoryRepository;
+    private Category category;
 
-    @AfterEach
-    public void rollbackDatabase() {
-        repository.deleteAll();
+    @BeforeEach
+    public void setup() {
+        var categoryList = categoryRepository.findAll();
+        if (categoryList.isEmpty()) {
+            Category category = new Category("Celulares & Tablets");;
+            categoryRepository.save(category);
+            this.category = category;
+        }
+        else {
+            this.category = categoryList.get(0);
+        }
     }
 
     @Test
@@ -41,7 +52,7 @@ public class CategoryRequestDtoTest {
 
     @Test
     public void testToModel() {
-        Category category = (new CategoryRequestDto("Test category").toModel(repository));
+        Category category = (new CategoryRequestDto("Test category").toModel(categoryRepository));
 
         assertTrue(category instanceof Category);
         assertEquals("Test category", category.getName());
@@ -60,7 +71,8 @@ public class CategoryRequestDtoTest {
 
         category.setIdParentCategory(0L);
 
-        assertEquals(1, validator.validate(category).size());
+        var edu = validator.validate(category);
+        assertEquals(2, validator.validate(category).size());
     }
 
     @Test
@@ -74,8 +86,8 @@ public class CategoryRequestDtoTest {
 
     @Test
     public void shouldReturnErrorWhenNameIsNotUnique() {
-        Category category = (new CategoryRequestDto("Test category")).toModel(repository);
-        repository.save(category);
+        Category category = (new CategoryRequestDto("Test category")).toModel(categoryRepository);
+        categoryRepository.save(category);
 
         CategoryRequestDto category2 = new CategoryRequestDto("Test category");
 

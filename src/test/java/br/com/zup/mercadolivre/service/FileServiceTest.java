@@ -1,15 +1,15 @@
 package br.com.zup.mercadolivre.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.io.FileNotFoundException;
-import java.nio.file.Paths;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.io.FileNotFoundException;
+import java.nio.file.Paths;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ContextConfiguration(classes = {FileService.class})
 @ExtendWith(SpringExtension.class)

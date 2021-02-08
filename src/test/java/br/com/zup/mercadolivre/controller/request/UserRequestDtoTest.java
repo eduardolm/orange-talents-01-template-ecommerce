@@ -69,7 +69,7 @@ public class UserRequestDtoTest {
     @Test
     public void shouldReturnValidationErrorIfPasswordIsEmpty() {
         UserRequestDto userRequestDto = new UserRequestDtoBuilder()
-                .withEmail("user@email.com")
+                .withEmail("user24@email.com")
                 .withPassword("")
                 .build();
 
@@ -80,10 +80,11 @@ public class UserRequestDtoTest {
     @Test
     public void shouldReturnValidationErrorIfPasswordLengthIsTooShort() {
         UserRequestDto userRequestDto = new UserRequestDtoBuilder()
-                .withEmail("user@email.com")
+                .withEmail("user23@email.com")
                 .withPassword("pass1")
                 .build();
 
+        var edu = validator.validate(userRequestDto);
         assertEquals(1, validator.validate(userRequestDto).size());
         assertTrue(userRequestDto instanceof UserRequestDto);
     }

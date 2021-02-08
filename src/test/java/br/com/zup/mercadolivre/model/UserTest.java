@@ -3,7 +3,8 @@ package br.com.zup.mercadolivre.model;
 import br.com.zup.mercadolivre.utils.builder.UserBuilder;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class UserTest {
 

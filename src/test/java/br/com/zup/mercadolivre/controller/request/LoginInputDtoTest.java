@@ -1,11 +1,9 @@
 package br.com.zup.mercadolivre.controller.request;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LoginInputDtoTest {
     @Test

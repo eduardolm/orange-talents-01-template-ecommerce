@@ -1,11 +1,11 @@
 package br.com.zup.mercadolivre.controller.request;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.ProductReview;
 import br.com.zup.mercadolivre.model.User;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ProductReviewRequestDtoTest {
     @Test

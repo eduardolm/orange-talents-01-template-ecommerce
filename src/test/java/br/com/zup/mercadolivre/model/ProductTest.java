@@ -2,7 +2,6 @@ package br.com.zup.mercadolivre.model;
 
 
 import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
-import br.com.zup.mercadolivre.controller.request.ProductRequestDto;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
 import br.com.zup.mercadolivre.utils.builder.ProductBuilder;
 import br.com.zup.mercadolivre.utils.builder.ProductRequestDtoBuilder;
@@ -28,7 +27,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.booleanThat;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
