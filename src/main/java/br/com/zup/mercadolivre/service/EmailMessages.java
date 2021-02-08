@@ -1,5 +1,6 @@
 package br.com.zup.mercadolivre.service;
 
+import br.com.zup.mercadolivre.dto.PurchaseDto;
 import br.com.zup.mercadolivre.enums.EmailFrom;
 import br.com.zup.mercadolivre.model.ProductQuestion;
 import br.com.zup.mercadolivre.model.Purchase;
@@ -28,9 +29,31 @@ public class EmailMessages {
         emailService.send(
                 purchase.getProduct().getProductOwner().getEmail(),
                 EmailFrom.PURCHASE.label ,
-                "Nova compra...",
-                "Você tem uma nova compra: " + purchase + " !" +
+                "Nova venda...",
+                "Você tem uma nova venda: " + purchase + " !" +
                         "\nDados do comprador: " + purchase.getCustomer().getEmail() +
                         "\nFaça o envio rápido para aumentar a satisfação do comprador.");
     }
+
+    public void purchaseSuccess(Purchase purchase) {
+        emailService.send(
+                purchase.getCustomer().getEmail(),
+                EmailFrom.PURCHASE.label,
+                "Parabéns! Seu pagamento foi aprovado.",
+                "\nSua compra foi finalizada com sucesso.\n" +
+                     "\n Entre em contato com o vendedor para combinar o envio do produto.\n" +
+                     "\nDados da compra: " + new PurchaseDto(purchase)
+        );
+    }
+    public void purchaseFailure(Purchase purchase) {
+        emailService.send(
+                purchase.getCustomer().getEmail(),
+                EmailFrom.PURCHASE.label,
+                "Ocorreu um erro com seu pagamento.",
+                "\nAcesse o link a seguir e faça o pagamento de sua compra.\n" +
+                     "\n Entre em contato com o vendedor para combinar o envio do produto.\n" +
+                     "\nDados da compra: " + new PurchaseDto(purchase)
+        );
+    }
+
 }

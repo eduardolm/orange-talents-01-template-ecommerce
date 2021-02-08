@@ -19,7 +19,8 @@ public class FileServiceTest {
 
     @Test
     public void testGetObjectFile() throws FileNotFoundException {
-        // Arrange, Act and Assert
+        assertEquals(0,
+                this.fileService.getObjectFile(Paths.get(System.getProperty("java.io.tmpdir"), "test.txt").toFile()).length);
         assertEquals(0,
                 this.fileService.getObjectFile(Paths.get(System.getProperty("java.io.tmpdir"), "test.txt").toFile()).length);
     }

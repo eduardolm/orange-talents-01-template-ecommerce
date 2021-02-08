@@ -17,8 +17,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -74,7 +73,7 @@ public class ProductReviewTest {
     public void shouldCreateNewProductReviewInstance() {
         ProductReview productReview = new ProductReview();
 
-        assertTrue(productReview instanceof ProductReview);
+        assertTrue(true);
     }
 
     @Test
@@ -82,7 +81,75 @@ public class ProductReviewTest {
         ProductReview productReview = new ProductReview(3, "Bom produto", "Produto atende as " +
                 "expectativas", product, user);
 
-        assertTrue(productReview instanceof ProductReview);
+        assertTrue(true);
+    }
+
+    @Test
+    public void testToString() {
+        assertEquals("ProductReview{Id:null, Nota:null, Titulo:'null', Descrição:'null', Produto:null, Cliente:null}",
+                (new ProductReview()).toString());
+    }
+
+    @Test
+    public void testEquals() {
+        assertNotEquals((new ProductReview()), "o");
+    }
+
+    @Test
+    public void testEquals2() {
+        ProductReview productReview = new ProductReview();
+
+        assertEquals(new ProductReview(), productReview);
+    }
+
+    @Test
+    public void testEquals3() {
+        ProductReview productReview = new ProductReview();
+        Product product = new Product();
+
+        assertNotEquals(new ProductReview(1, "Dr", "The characteristics of someone or something", product, new User()), productReview);
+    }
+
+    @Test
+    public void testEquals4() {
+        Product product = new Product();
+        ProductReview productReview = new ProductReview(1, "Dr", "The characteristics of someone or something", product,
+                new User());
+
+        assertNotEquals(new ProductReview(), productReview);
+    }
+
+    @Test
+    public void testEquals5() {
+        ProductReview productReview = new ProductReview(1, "Dr", "The characteristics of someone or something", null,
+                new User());
+        Product product = new Product();
+
+        assertNotEquals(new ProductReview(1, "Dr", "The characteristics of someone or something", product, new User()), productReview);
+    }
+
+    @Test
+    public void testEquals6() {
+        ProductReview productReview = new ProductReview();
+        Product product = new Product();
+
+        assertNotEquals(new ProductReview(1, null, "The characteristics of someone or something", product, new User()), productReview);
+    }
+
+    @Test
+    public void testEquals7() {
+        Product product = new Product();
+        ProductReview productReview = new ProductReview(1, null, "The characteristics of someone or something", product,
+                new User());
+
+        assertNotEquals(new ProductReview(), productReview);
+    }
+
+    @Test
+    public void testHashCode() {
+        assertEquals(0, (new ProductReview()).hashCode());
+        assertEquals(-660048912,
+                (new ProductReview(1, "Dr", "The characteristics of someone or something", null, new User())).hashCode());
     }
 
     @Test

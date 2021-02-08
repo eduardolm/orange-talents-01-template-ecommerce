@@ -33,11 +33,10 @@ public class CategoryRequestDtoTest {
     public void setup() {
         var categoryList = categoryRepository.findAll();
         if (categoryList.isEmpty()) {
-            Category category = new Category("Celulares & Tablets");;
+            Category category = new Category("Celulares & Tablets");
             categoryRepository.save(category);
             this.category = category;
-        }
-        else {
+        } else {
             this.category = categoryList.get(0);
         }
     }
@@ -54,7 +53,7 @@ public class CategoryRequestDtoTest {
     public void testToModel() {
         Category category = (new CategoryRequestDto("Test category").toModel(categoryRepository));
 
-        assertTrue(category instanceof Category);
+        assertTrue(category != null);
         assertEquals("Test category", category.getName());
     }
 
@@ -104,6 +103,15 @@ public class CategoryRequestDtoTest {
     }
 
     @Test
+    public void testSetName() {
+        CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
+
+        categoryRequestDto.setName("Name");
+
+        assertEquals("Name", categoryRequestDto.getName());
+    }
+
+    @Test
     public void shouldSetIdParentCategory() {
         CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
 
@@ -113,7 +121,21 @@ public class CategoryRequestDtoTest {
     }
 
     @Test
+    public void testSetIdParentCategory() {
+        CategoryRequestDto categoryRequestDto = new CategoryRequestDto();
+
+        categoryRequestDto.setIdParentCategory(1L);
+
+        assertEquals(1L, categoryRequestDto.getIdParentCategory().longValue());
+    }
+
+    @Test
     public void shouldToStringReturnAsExpected() {
+        assertEquals("CategoryRequestDto{Categoria='null', idCategoriaMae=null}", (new CategoryRequestDto()).toString());
+    }
+
+    @Test
+    public void testToString() {
         assertEquals("CategoryRequestDto{Categoria='null', idCategoriaMae=null}", (new CategoryRequestDto()).toString());
     }
 }

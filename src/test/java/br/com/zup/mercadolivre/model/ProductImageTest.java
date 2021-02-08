@@ -71,45 +71,68 @@ public class ProductImageTest {
 
         ProductImage productImage = new ProductImage(product, "https://localhost.com");
 
-        assertTrue(productImage instanceof ProductImage);
+        assertTrue(true);
         assertEquals("https://localhost.com", productImage.getLink());
     }
 
     @Test
     public void testToString() {
-        // Arrange, Act and Assert
+        assertEquals("ProductImage{id=null, link='null'}", (new ProductImage()).toString());
         assertEquals("ProductImage{id=null, link='null'}", (new ProductImage()).toString());
     }
 
     @Test
     public void testEquals() {
-        // Arrange, Act and Assert
-        assertFalse((new ProductImage()).equals("obj"));
+        assertNotEquals((new ProductImage()), "obj");
+        assertNotEquals((new ProductImage()), "obj");
     }
 
     @Test
     public void testEquals2() {
-        // Arrange
         ProductImage productImage = new ProductImage();
 
-        // Act and Assert
-        assertTrue(productImage.equals(new ProductImage()));
+        assertEquals(new ProductImage(), productImage);
     }
 
     @Test
     public void testEquals3() {
-        // Arrange
         ProductImage productImage = new ProductImage();
 
-        // Act and Assert
-        assertFalse(productImage.equals(new ProductImage(new Product(), "Link")));
+        assertNotEquals(new ProductImage(new Product(), "Link"), productImage);
+    }
+
+    @Test
+    public void testEquals4() {
+        ProductImage productImage = new ProductImage();
+
+        ProductImage productImage1 = new ProductImage();
+        productImage1.setOriginalFileName("foo.txt");
+
+        assertEquals(productImage1, productImage);
+    }
+
+    @Test
+    public void testEquals5() {
+        ProductImage productImage = new ProductImage();
+
+        assertNotEquals(new ProductImage(new Product(), "Link"), productImage);
     }
 
     @Test
     public void testHashCode() {
-        // Arrange, Act and Assert
         assertEquals(0, (new ProductImage()).hashCode());
         assertEquals(2368538, (new ProductImage(null, "Link")).hashCode());
+        assertEquals(0, (new ProductImage()).hashCode());
+        assertEquals(2368538, (new ProductImage(null, "Link")).hashCode());
+    }
+
+    @Test
+    public void testSetOriginalFileName() {
+        ProductImage productImage = new ProductImage();
+
+        productImage.setOriginalFileName("foo.txt");
+
+        assertEquals("foo.txt", productImage.getOriginalFileName());
     }
 }
 

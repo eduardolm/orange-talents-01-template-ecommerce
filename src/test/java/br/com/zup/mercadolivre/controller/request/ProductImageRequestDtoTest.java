@@ -17,5 +17,15 @@ public class ProductImageRequestDtoTest {
 
         assertSame(multipartFileList, productImageRequestDto.getImages());
     }
+
+    @Test
+    public void testSetImages2() {
+        ProductImageRequestDto productImageRequestDto = new ProductImageRequestDto(new ArrayList<>());
+        ArrayList<MultipartFile> multipartFileList = new ArrayList<>();
+
+        productImageRequestDto.setImages(multipartFileList);
+
+        assertSame(multipartFileList, productImageRequestDto.getImages());
+    }
 }
 

@@ -1,7 +1,9 @@
 package br.com.zup.mercadolivre.model;
 
 import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
+import br.com.zup.mercadolivre.controller.request.PagSeguroRequestDto;
 import br.com.zup.mercadolivre.controller.request.PaymentGatewayResponseDto;
+import br.com.zup.mercadolivre.enums.PagSeguroReturnStatus;
 import br.com.zup.mercadolivre.enums.PaymentGateway;
 import br.com.zup.mercadolivre.enums.TransactionStatus;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
@@ -20,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Validator;
 import java.math.BigDecimal;
@@ -46,6 +49,26 @@ public class PurchaseTest {
 
     @Autowired
     private Validator validator;
+
+    @Test
+    public void testConstructor() {
+        assertEquals("Purchase{id=null, product=null, quantity=0, customer=null, paymentGateway=null, transactions=[]}",
+                (new Purchase()).toString());
+    }
+
+    @Test
+    public void testConstructor2() {
+        Product product = new Product();
+
+        Purchase actualPurchase = new Purchase(product, 1, new User(), PaymentGateway.PAG_SEGURO);
+
+        assertEquals(
+                "Purchase{id=null, product=Produto{Id=null, Nome:'null', Quantidade:null, Descrição:'null', Preço:null,"
+                        + " Categoria:null, Proprietário:null, Características:{}, Imagens:[]}, quantity=1, customer=Usuário{id:null,"
+                        + " e-mail:'null', Cadastrado em:null}, paymentGateway=PAG_SEGURO, transactions=[]}",
+                actualPurchase.toString());
+        assertEquals(1, actualPurchase.getQuantity());
+    }
 
     @BeforeEach
     public void setup() {
@@ -89,15 +112,40 @@ public class PurchaseTest {
     public void testToString() {
         assertEquals("Purchase{id=null, product=null, quantity=0, customer=null, paymentGateway=null, transactions=[]}",
                 (new Purchase()).toString());
+        assertEquals("Purchase{id=null, product=null, quantity=0, customer=null, paymentGateway=null, transactions=[]}",
+                (new Purchase()).toString());
+    }
+
+    @Test
+    public void testRedirectUrl() {
+        Product product = new Product();
+        Purchase purchase = new Purchase(product, 1, new User(), PaymentGateway.PAG_SEGURO);
+
+        assertEquals("pagseguro.com/null?redirectUrl=/retorno-pagseguro/",
+                purchase.redirectUrl(UriComponentsBuilder.newInstance()));
+    }
+
+    @Test
+    public void testAddTransaction() {
+        Purchase purchase = new Purchase();
+
+        purchase.addTransaction(new PagSeguroRequestDto("42", PagSeguroReturnStatus.SUCESSO));
+
+        assertEquals(1, purchase.getTransactions().size());
+    }
+
+    @Test
+    public void testSuccessfullyProcessed() {
+        assertFalse((new Purchase()).successfullyProcessed());
     }
 
     @Test
     public void shouldCreateNewPurchaseInstance() {
         Purchase purchase = new Purchase(this.product, 10, this.user, PaymentGateway.PAYPAL);
 
-        assertTrue(purchase instanceof Purchase);
+        assertTrue(true);
         assertEquals("Galaxy S20", purchase.getProduct().getName());
-        assertEquals(new BigDecimal( "2000"), purchase.getProduct().getPrice());
+        assertEquals(new BigDecimal("2000"), purchase.getProduct().getPrice());
     }
 
     @Test
@@ -121,7 +169,7 @@ public class PurchaseTest {
         PaymentGatewayResponseDto paymentGatewayResponseDto2 = (purchase) ->
                 new Transaction(TransactionStatus.erro, "1", purchase);
 
-        assertThrows(IllegalStateException.class, () ->  newPurchase.addTransaction(paymentGatewayResponseDto2));
+        assertThrows(IllegalStateException.class, () -> newPurchase.addTransaction(paymentGatewayResponseDto2));
     }
 
     @Test

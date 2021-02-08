@@ -22,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -33,13 +34,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 public class ProductTest {
+
     @MockBean
     private CategoryRepository categoryRepository;
 
     private User user;
     private Category category;
     private Product product;
-    private Collection<CharacteristicsRequestDto> characteristics;
+    private List<CharacteristicsRequestDto> characteristics;
 
     @BeforeEach
     public void setup() {
@@ -58,6 +60,56 @@ public class ProductTest {
                 new CharacteristicsRequestDto("key2", "value2"),
                 new CharacteristicsRequestDto("key3", "value3")
         );
+    }
+
+    @Test
+    public void testConstructor() {
+        assertEquals("Produto{Id=null, Nome:'null', Quantidade:null, Descrição:'null', Preço:null, Categoria:null,"
+                + " Proprietário:null, Características:{}, Imagens:[]}", (new Product()).toString());
+    }
+
+    @Test
+    public void testSetImages() {
+        Product product = new Product();
+
+        product.setImages(new HashSet<>());
+
+        assertEquals("Produto{Id=null, Nome:'null', Quantidade:null, Descrição:'null', Preço:null, Categoria:null,"
+                + " Proprietário:null, Características:{}, Imagens:[]}", product.toString());
+    }
+
+    @Test
+    public void testSetId() {
+        Product product = new Product();
+
+        product.setId(123L);
+
+        assertEquals(123L, product.getId().longValue());
+    }
+
+    @Test
+    public void testToString() {
+        assertEquals("Produto{Id=null, Nome:'null', Quantidade:null, Descrição:'null', Preço:null, Categoria:null,"
+                + " Proprietário:null, Características:{}, Imagens:[]}", (new Product()).toString());
+    }
+
+    @Test
+    public void testEquals() {
+        assertNotEquals((new Product()), "o");
+    }
+
+    @Test
+    public void testAddImages() {
+        Product product = new Product();
+
+        product.addImages(new HashSet<>());
+
+        assertTrue(product.getImages().isEmpty());
+    }
+
+    @Test
+    public void testGetReviews() {
+        assertEquals(0, (new Product()).getReviews().total());
     }
 
     @AfterEach
@@ -155,12 +207,10 @@ public class ProductTest {
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
                 .withCategory(new Category("Celulares & Tablets"))
-                .withCharacteristics(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
-                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
-                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
+                .withCharacteristics(this.characteristics)
                 .build();
 
-        assertTrue(product instanceof Product);
+        assertNotNull(product);
     }
 
     @Test
@@ -172,9 +222,7 @@ public class ProductTest {
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
                 .withCategory(1L)
-                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
-                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
-                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
+                .withCharacteristcs(this.characteristics)
                 .build().toModel(categoryRepository, user);
 
         Product product2 = new ProductRequestDtoBuilder()
@@ -183,9 +231,7 @@ public class ProductTest {
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
                 .withCategory(1L)
-                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
-                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
-                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
+                .withCharacteristcs(this.characteristics)
                 .build().toModel(categoryRepository, user);
 
         User product3 = new User();
@@ -204,9 +250,7 @@ public class ProductTest {
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
                 .withCategory(1L)
-                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
-                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
-                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
+                .withCharacteristcs(this.characteristics)
                 .build().toModel(categoryRepository, user);
 
         Product product2 = new ProductRequestDtoBuilder()
@@ -215,9 +259,7 @@ public class ProductTest {
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
                 .withCategory(1L)
-                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
-                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
-                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
+                .withCharacteristcs(this.characteristics)
                 .build().toModel(categoryRepository, user);
 
         assertEquals(product.hashCode(), product2.hashCode());
@@ -231,9 +273,7 @@ public class ProductTest {
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
                 .withCategory(1L)
-                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
-                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
-                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
+                .withCharacteristcs(this.characteristics)
                 .build().toModel(categoryRepository, user);
 
         assertEquals("Galaxy S20", product.getName());

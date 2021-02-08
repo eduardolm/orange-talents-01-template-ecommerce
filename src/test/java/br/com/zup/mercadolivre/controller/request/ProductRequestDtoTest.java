@@ -4,28 +4,30 @@ import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
-import br.com.zup.mercadolivre.repository.ProductRepository;
 import br.com.zup.mercadolivre.utils.builder.ProductRequestDtoBuilder;
 import br.com.zup.mercadolivre.utils.builder.UserBuilder;
 import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.validation.Validator;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -36,9 +38,6 @@ public class ProductRequestDtoTest {
     @Autowired
     private Validator validator;
 
-    @MockBean
-    private ProductRepository repository;
-
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -46,17 +45,41 @@ public class ProductRequestDtoTest {
 
     @BeforeEach
     public void setup() {
-        if (!categoryRepository.findAll().isEmpty()) {
-            categoryRepository.deleteAll();
+        // Create Category
+        var existingCategory = categoryRepository.findById(1L);
+        if (existingCategory.isEmpty()) {
+            Category category = new Category("Celulares & Tablets");
+            categoryRepository.save(category);
+            this.category = category;
         }
-        Category category = new Category("Celulares & Tablets");;
-        categoryRepository.save(category);
-        this.category = category;
+        else {
+            this.category = existingCategory.get();
+        }
     }
 
-    @AfterEach
-    public void rollbackDatabase() {
-        repository.deleteAll();
+    @Test
+    public void testConstructor() {
+        assertEquals("ProductRequestDto{Preço:'null', Quantidade:null, Descrição:'null', Preço:null, CategoriaId:null,"
+                + " Características:[]}", (new ProductRequestDto()).toString());
+    }
+
+    @Test
+    public void testConstructor2() {
+        BigDecimal price = BigDecimal.valueOf(42L);
+
+        ProductRequestDto actualProductRequestDto = new ProductRequestDto("Name", 1,
+                "The characteristics of someone or something", price, 123L, new ArrayList<>());
+
+        assertEquals("Name", actualProductRequestDto.getName());
+        assertEquals(1, actualProductRequestDto.getQuantity().intValue());
+        assertEquals(
+                "ProductRequestDto{Preço:'Name', Quantidade:1, Descrição:'The characteristics of someone or something',"
+                        + " Preço:42, CategoriaId:123, Características:[]}",
+                actualProductRequestDto.toString());
+        assertEquals("The characteristics of someone or something", actualProductRequestDto.getDescription());
+        assertEquals(123L, actualProductRequestDto.getCategoryId().longValue());
+        assertTrue(actualProductRequestDto.getCharacteristics().isEmpty());
+        assertEquals("42", actualProductRequestDto.getPrice().toString());
     }
 
     @ParameterizedTest
@@ -68,7 +91,7 @@ public class ProductRequestDtoTest {
                 .withQuantity(16)
                 .withDescription("Testing product")
                 .withPrice(new BigDecimal("500"))
-                .withCategory(category.getId())
+                .withCategory(this.category.getId())
                 .withCharacteristcs(newCharacteristics)
                 .build();
 
@@ -84,6 +107,7 @@ public class ProductRequestDtoTest {
                         new CharacteristicsRequestDto("key1", "value1")))
         );
     }
+
     @Test
     public void shouldCreateNewInstanceOfProductRequestDto() {
         ProductRequestDto productRequestDto = new ProductRequestDtoBuilder()
@@ -91,13 +115,13 @@ public class ProductRequestDtoTest {
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(1L)
+                .withCategory(this.category.getId())
                 .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
                         new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
-        assertTrue(productRequestDto instanceof ProductRequestDto);
+        assertNotNull(productRequestDto);
     }
 
     @Test
@@ -115,8 +139,39 @@ public class ProductRequestDtoTest {
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build()).toModel(categoryRepository, user);
 
-        assertTrue(product instanceof Product);
+        assertNotNull(product);
         assertEquals("Galaxy S20", product.getName());
+    }
+
+    @Test
+    public void testFindRepeatedCharacteristics() {
+        assertTrue((new ProductRequestDto()).findRepeatedCharacteristics().isEmpty());
+    }
+
+    @Test
+    public void testFindRepeatedCharacteristics2() {
+        ArrayList<CharacteristicsRequestDto> characteristicsRequestDtoList = new ArrayList<>();
+        characteristicsRequestDtoList
+                .add(new CharacteristicsRequestDto("Name", "The characteristics of someone or something"));
+
+        assertTrue((new ProductRequestDto("Name", 1, "The characteristics of someone or something", BigDecimal.valueOf(42L),
+                123L, characteristicsRequestDtoList)).findRepeatedCharacteristics().isEmpty());
+    }
+
+    @Test
+    public void testFindRepeatedCharacteristics3() {
+        ArrayList<CharacteristicsRequestDto> characteristicsRequestDtoList = new ArrayList<>();
+        characteristicsRequestDtoList
+                .add(new CharacteristicsRequestDto("Name", "The characteristics of someone or something"));
+        characteristicsRequestDtoList
+                .add(new CharacteristicsRequestDto("Name", "The characteristics of someone or something"));
+
+        Set<String> actualFindRepeatedCharacteristicsResult = (new ProductRequestDto("Name", 1,
+                "The characteristics of someone or something", BigDecimal.valueOf(42L), 123L, characteristicsRequestDtoList))
+                .findRepeatedCharacteristics();
+
+        assertEquals(1, actualFindRepeatedCharacteristicsResult.size());
+        assertTrue(actualFindRepeatedCharacteristicsResult.contains("Name"));
     }
 
     @Test
@@ -126,7 +181,7 @@ public class ProductRequestDtoTest {
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(1L)
+                .withCategory(this.category.getId())
                 .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
                         new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
@@ -143,13 +198,13 @@ public class ProductRequestDtoTest {
                 .withQuantity(0)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(2L)
+                .withCategory(this.category.getId())
                 .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
                         new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
-        assertTrue(product instanceof ProductRequestDto);
+        assertNotNull(product);
     }
 
     @Test
@@ -159,14 +214,14 @@ public class ProductRequestDtoTest {
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("0"))
-                .withCategory(1L)
+                .withCategory(this.category.getId())
                 .withCharacteristcs(Lists.newArrayList(
                         new CharacteristicsRequestDto("Peso", "145g"),
                         new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
-        assertEquals(2, validator.validate(product).size());
+        assertEquals(1, validator.validate(product).size());
     }
 
     @Test
@@ -176,14 +231,49 @@ public class ProductRequestDtoTest {
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(2L)
+                .withCategory(this.category.getId())
                 .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
                         new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
         assertEquals("ProductRequestDto{Preço:'Galaxy S20', Quantidade:100, Descrição:'Celular top da " +
-                "categoria', Preço:2000, CategoriaId:2, Características:[Peso: 145g, Conectividade: 5G, Wi-Fi, " +
+                "categoria', Preço:2000, CategoriaId:1, Características:[Peso: 145g, Conectividade: 5G, Wi-Fi, " +
                 "Bluetooth, Itens incluídos: Celular, carregador, cabo mini usb]}", product.toString());
+    }
+
+    @Test
+    public void testToString() {
+        assertEquals("ProductRequestDto{Preço:'null', Quantidade:null, Descrição:'null', Preço:null, CategoriaId:null,"
+                + " Características:[]}", (new ProductRequestDto()).toString());
+    }
+
+    @Test
+    public void testToString2() {
+        ArrayList<CharacteristicsRequestDto> characteristicsRequestDtoList = new ArrayList<>();
+        characteristicsRequestDtoList
+                .add(new CharacteristicsRequestDto("Name", "The characteristics of someone or something"));
+
+        assertEquals(
+                "ProductRequestDto{Preço:'Name', Quantidade:1, Descrição:'The characteristics of someone or something',"
+                        + " Preço:42, CategoriaId:123, Características:[Name: The characteristics of someone or something]}",
+                (new ProductRequestDto("Name", 1, "The characteristics of someone or something", BigDecimal.valueOf(42L), 123L,
+                        characteristicsRequestDtoList)).toString());
+    }
+
+    @Test
+    public void testToString3() {
+        ArrayList<CharacteristicsRequestDto> characteristicsRequestDtoList = new ArrayList<>();
+        characteristicsRequestDtoList
+                .add(new CharacteristicsRequestDto("Name", "The characteristics of someone or something"));
+        characteristicsRequestDtoList
+                .add(new CharacteristicsRequestDto("Name", "The characteristics of someone or something"));
+
+        assertEquals(
+                "ProductRequestDto{Preço:'Name', Quantidade:1, Descrição:'The characteristics of someone or something',"
+                        + " Preço:42, CategoriaId:123, Características:[Name: The characteristics of someone or something, Name:"
+                        + " The characteristics of someone or something]}",
+                (new ProductRequestDto("Name", 1, "The characteristics of someone or something", BigDecimal.valueOf(42L), 123L,
+                        characteristicsRequestDtoList)).toString());
     }
 }

@@ -18,8 +18,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -66,6 +65,101 @@ public class ProductQuestionTest {
                 .build().toModel(categoryRepository, this.user);
     }
 
+    @Test
+    public void testConstructor() {
+        User interested = new User();
+
+        ProductQuestion actualProductQuestion = new ProductQuestion("Dr", interested, new Product());
+
+        assertNull(actualProductQuestion.getProductOwner());
+        assertEquals("Question{Id:null, Título:'Dr', Interessado:null, Produto:null}", actualProductQuestion.toString());
+        assertEquals("Dr", actualProductQuestion.getTitle());
+    }
+
+    @Test
+    public void testToString() {
+        User interested = new User();
+
+        assertEquals("Question{Id:null, Título:'Dr', Interessado:null, Produto:null}",
+                (new ProductQuestion("Dr", interested, new Product())).toString());
+    }
+
+    @Test
+    public void testToString2() {
+        Product product = new Product();
+        product.setId(123L);
+
+        assertEquals("Question{Id:null, Título:'Dr', Interessado:null, Produto:null}",
+                (new ProductQuestion("Dr", new User(), product)).toString());
+    }
+
+    @Test
+    public void testGetProductOwner() {
+        User interested = new User();
+
+        assertNull((new ProductQuestion("Dr", interested, new Product())).getProductOwner());
+    }
+
+    @Test
+    public void testEquals() {
+        assertNotEquals((new ProductQuestion()), "o");
+    }
+
+    @Test
+    public void testEquals2() {
+        ProductQuestion productQuestion = new ProductQuestion();
+
+        assertEquals(new ProductQuestion(), productQuestion);
+    }
+
+    @Test
+    public void testEquals3() {
+        ProductQuestion productQuestion = new ProductQuestion();
+        User interested = new User();
+
+        assertNotEquals(new ProductQuestion("Dr", interested, new Product()), productQuestion);
+    }
+
+    @Test
+    public void testEquals4() {
+        User interested = new User();
+        ProductQuestion productQuestion = new ProductQuestion("Dr", interested, new Product());
+
+        assertNotEquals(new ProductQuestion(), productQuestion);
+    }
+
+    @Test
+    public void testEquals5() {
+        ProductQuestion productQuestion = new ProductQuestion("Dr", null, new Product());
+        User interested = new User();
+
+        assertNotEquals(new ProductQuestion("Dr", interested, new Product()), productQuestion);
+    }
+
+    @Test
+    public void testEquals6() {
+        User interested = new User("jane.doe@example.org", "iloveyou");
+        ProductQuestion productQuestion = new ProductQuestion("Dr", interested, new Product());
+        User interested1 = new User();
+
+        assertNotEquals(new ProductQuestion("Dr", interested1, new Product()), productQuestion);
+    }
+
+    @Test
+    public void testHashCode() {
+        assertEquals(0, (new ProductQuestion()).hashCode());
+        assertEquals(2165133, (new ProductQuestion("Dr", new User(), null)).hashCode());
+    }
+
+    @Test
+    public void testCompareTo() {
+        User interested = new User();
+        ProductQuestion productQuestion = new ProductQuestion("Dr", interested, new Product());
+        User interested1 = new User();
+
+        assertEquals(0, productQuestion.compareTo(new ProductQuestion("Dr", interested1, new Product())));
+    }
+
     @AfterEach
     public void rollbackDatabase() {
         categoryRepository.deleteAll();
@@ -77,7 +171,7 @@ public class ProductQuestionTest {
                 .withTitle("Test title")
                 .build().toModel(this.user, this.product);
 
-        assertTrue(productQuestion instanceof ProductQuestion);
+        assertNotNull(productQuestion);
     }
 
     @Test

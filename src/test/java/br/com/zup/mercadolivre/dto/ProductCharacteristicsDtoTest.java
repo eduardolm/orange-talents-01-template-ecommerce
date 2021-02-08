@@ -28,5 +28,26 @@ public class ProductCharacteristicsDtoTest {
         assertNull(actualProductCharacteristicsDto.getId());
         assertEquals("The characteristics of someone or something", actualProductCharacteristicsDto.getDescription());
     }
+
+    @Test
+    public void testConstructor() {
+        ProductCharacteristicsDto actualProductCharacteristicsDto = new ProductCharacteristicsDto(
+                new ProductCharacteristics());
+
+        assertNull(actualProductCharacteristicsDto.getName());
+        assertNull(actualProductCharacteristicsDto.getId());
+        assertNull(actualProductCharacteristicsDto.getDescription());
+    }
+
+    @Test
+    public void testConstructor2() {
+        ProductCharacteristicsDto actualProductCharacteristicsDto = new ProductCharacteristicsDto(
+                new ProductCharacteristics("br.com.zup.mercadolivre.model.ProductCharacteristics",
+                        "The characteristics of someone or something", new Product()));
+
+        assertEquals("br.com.zup.mercadolivre.model.ProductCharacteristics", actualProductCharacteristicsDto.getName());
+        assertNull(actualProductCharacteristicsDto.getId());
+        assertEquals("The characteristics of someone or something", actualProductCharacteristicsDto.getDescription());
+    }
 }
 

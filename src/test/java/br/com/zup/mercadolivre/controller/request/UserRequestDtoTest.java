@@ -1,6 +1,5 @@
 package br.com.zup.mercadolivre.controller.request;
 
-import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.utils.builder.UserBuilder;
 import br.com.zup.mercadolivre.utils.builder.UserRequestDtoBuilder;
 import org.junit.jupiter.api.Test;
@@ -14,12 +13,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.validation.Validator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 public class UserRequestDtoTest {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private Validator validator;
@@ -40,8 +42,17 @@ public class UserRequestDtoTest {
                 .withPassword("pass12345")
                 .build();
 
-        assertTrue(testUser instanceof User);
+        assertNotNull(testUser);
         assertEquals(testUser.hashCode(), newUser.hashCode());
+    }
+
+    @Test
+    public void testToModel2() {
+        // Arrange
+        UserRequestDto userRequestDto = new UserRequestDto("jane.doe@example.org", "iloveyou");
+
+        // Act and Assert
+        assertEquals("jane.doe@example.org", userRequestDto.toModel(this.passwordEncoder).getEmail());
     }
 
     @Test
@@ -52,7 +63,7 @@ public class UserRequestDtoTest {
                 .build();
 
         assertEquals(1, validator.validate(userRequestDto).size());
-        assertTrue(userRequestDto instanceof UserRequestDto);
+        assertNotNull(userRequestDto);
     }
 
     @Test
@@ -63,7 +74,7 @@ public class UserRequestDtoTest {
                 .build();
 
         assertEquals(1, validator.validate(userRequestDto).size());
-        assertTrue(userRequestDto instanceof UserRequestDto);
+        assertNotNull(userRequestDto);
     }
 
     @Test
@@ -74,7 +85,7 @@ public class UserRequestDtoTest {
                 .build();
 
         assertEquals(2, validator.validate(userRequestDto).size());
-        assertTrue(userRequestDto instanceof UserRequestDto);
+        assertNotNull(userRequestDto);
     }
 
     @Test
@@ -86,7 +97,7 @@ public class UserRequestDtoTest {
 
         var edu = validator.validate(userRequestDto);
         assertEquals(1, validator.validate(userRequestDto).size());
-        assertTrue(userRequestDto instanceof UserRequestDto);
+        assertNotNull(userRequestDto);
     }
 }
 
