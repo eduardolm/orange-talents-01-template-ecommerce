@@ -88,7 +88,7 @@ public class PurchaseTest {
 
     @Test
     public void testToString() {
-        assertEquals("Purchase{Id:null, Produto:null, Quantidade:0, Comprador:null, Pagamento:null}",
+        assertEquals("Purchase{id=null, product=null, quantity=0, customer=null, paymentGateway=null, transactions=[]}",
                 (new Purchase()).toString());
     }
 

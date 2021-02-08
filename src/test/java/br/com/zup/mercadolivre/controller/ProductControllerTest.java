@@ -7,6 +7,7 @@ import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
 import br.com.zup.mercadolivre.repository.ProductRepository;
+import br.com.zup.mercadolivre.repository.UserRepository;
 import br.com.zup.mercadolivre.utils.builder.CategoryBuilder;
 import br.com.zup.mercadolivre.utils.builder.ProductRequestDtoBuilder;
 import br.com.zup.mercadolivre.utils.builder.UserBuilder;
@@ -50,39 +51,44 @@ public class ProductControllerTest {
     @MockBean
     private ProductRepository repository;
 
-    @MockBean
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private CategoryRepository categoryRepository;
 
     @Autowired
     private ObjectMapper mapper;
 
     private Category category;
+    private User user;
 
-    @BeforeEach
-    public void setup() {
-        Category category = new Category("Celulares & Tablets");
-        category.setId(1L);
-        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
-        this.category = category;
-    }
 
     @AfterEach
     public void rollbackDatabase() {
         repository.deleteAll();
+        categoryRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
     @WithMockUser(username = "user@email.com", password = "pass1234")
     public void shouldListProducts() throws Exception {
 
-        User user = new UserBuilder().withEmail("user2@email.com").withPassword("pass1234").build();
+        User user = new UserBuilder().withEmail("user@email.com").withPassword("pass1234").build();
+        userRepository.save(user);
+        this.user = user;
+
+        Category category = new Category("teste");
+        categoryRepository.save(category);
+        this.category = category;
 
         ProductRequestDto productRequestDto = new ProductRequestDtoBuilder()
                 .withName("Galaxy S20")
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(category.getId())
+                .withCategory(this.category.getId())
                 .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
                         new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
@@ -105,24 +111,33 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(username = "user@email.com", password = "pass1234")
     public void shouldCreateProduct() throws Exception {
-        User user = new UserBuilder().withEmail("user2@email.com").withPassword("pass1234").build();
+        User user = new UserBuilder().withEmail("user@email.com").withPassword("pass1234").build();
+        userRepository.save(user);
+        this.user = user;
+
+        Category category = new Category("teste");
+        categoryRepository.save(category);
+        this.category = category;
+
         ProductRequestDto productRequestDto = new ProductRequestDtoBuilder()
                 .withName("Galaxy S20")
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(category.getId())
+                .withCategory(this.category.getId())
                 .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
                         new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
+        Product product = productRequestDto.toModel(categoryRepository, this.user);
+        repository.save(product);
+
         mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
-        Product product = productRequestDto.toModel(categoryRepository, user);
 
         when(repository.save(product)).thenReturn(product);
 
-        var response = mockMvc.perform(post("/api/v1/products")
+        mockMvc.perform(post("/api/v1/products")
                 .content(mapper.writeValueAsString(productRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

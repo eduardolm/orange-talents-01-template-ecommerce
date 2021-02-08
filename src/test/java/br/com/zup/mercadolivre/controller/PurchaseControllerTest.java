@@ -11,7 +11,8 @@ import br.com.zup.mercadolivre.repository.CategoryRepository;
 import br.com.zup.mercadolivre.repository.ProductRepository;
 import br.com.zup.mercadolivre.repository.PurchaseRepository;
 import br.com.zup.mercadolivre.repository.UserRepository;
-import br.com.zup.mercadolivre.service.EmailMessages;
+import br.com.zup.mercadolivre.service.EmailService;
+import br.com.zup.mercadolivre.service.IEmailService;
 import br.com.zup.mercadolivre.utils.builder.ProductBuilder;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.AfterEach;
@@ -22,66 +23,93 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.BindException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.persistence.EntityManager;
-import javax.validation.Validator;
 import java.math.BigDecimal;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 public class PurchaseControllerTest {
 
-    private EntityManager manager = Mockito.mock(EntityManager.class);
-    private UserRepository userRepository = Mockito.mock(UserRepository.class);
-    private EmailMessages email = Mockito.mock(EmailMessages.class);
-//    private PurchaseController controller = new PurchaseController(manager, userRepository, email);
-    private User owner = new User("emaildedono@mail.com", "pass1234");
-    private UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
-            .fromHttpUrl("http://localhost:8080");
+    @Autowired
+    private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private CategoryRepository categoryRepository;
 
-    @MockBean
+    @Autowired
     private ProductRepository productRepository;
 
-    @MockBean
+    @Autowired
     private PurchaseRepository purchaseRepository;
 
-    @MockBean
+    @Autowired
     private PurchaseController controller;
+
+    @Autowired
+    private EmailService email;
+
+    private UriComponentsBuilder uriComponentsBuilder = Mockito.mock(UriComponentsBuilder.class);
 
     private User user;
     private Category category;
     private Product product;
-    private Collection<CharacteristicsRequestDto> characteristics;
-
-    @Autowired
-    private Validator validator;
+    private List<CharacteristicsRequestDto> characteristics;
+    private Purchase purchase;
+    private User owner;
 
     @BeforeEach
     public void setup() {
         // Create User
-        this.user = new User("test@email.com", "pass1234");
+        var existingUser = userRepository.findUserByEmail("test@email.com");
+        if (existingUser.isEmpty()) {
+            User user = new User("test@email.com", "pass1234");
+            userRepository.save(user);
+            this.user = user;
+        }
+        else {
+            this.user = existingUser.get();
+        }
+
+        var existingOwner = userRepository.findUserByEmail("owner@mail.com");
+        if (existingOwner.isEmpty()) {
+            User owner = new User("owner@mail.com", "pass1234");
+            userRepository.save(owner);
+            this.owner = owner;
+        }
+        else {
+            this.owner = existingOwner.get();
+        }
+
 
         // Create Category
-        Category category = new Category("Celulares & Tablets");
-        category.setId(1L);
-        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
-        this.category = category;
+        var existingCategory = categoryRepository.findById(1L);
+        if (existingCategory.isEmpty()) {
+            Category category = new Category("Celulares & Tablets");
+            categoryRepository.save(category);
+            this.category = category;
+        }
+        else {
+            this.category = existingCategory.get();
+        }
 
         // Create Characteristics
         this.characteristics = Lists.newArrayList(
@@ -91,48 +119,68 @@ public class PurchaseControllerTest {
         );
 
         // Create product
-        this.product = new ProductBuilder()
-                .withName("Galaxy S20")
-                .withQuantity(100)
-                .withDescription("Celular top da categoria")
-                .withPrice(new BigDecimal("2000"))
-                .withCategory(new Category("Celulares & Tablets"))
-                .withCharacteristics(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
-                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
-                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
-                .build();
-        this.product.setId(1L);
+        var existingProduct = productRepository.findById(1L);
+        if (existingProduct.isEmpty()) {
+            Product product = new ProductBuilder()
+                    .withName("Galaxy S20")
+                    .withQuantity(1)
+                    .withDescription("Celular top da categoria")
+                    .withPrice(new BigDecimal("2000"))
+                    .withCategory(this.category)
+                    .withCharacteristics(this.characteristics)
+                    .withProductOwner(this.user)
+                    .build();
 
-        Mockito.when(userRepository.findUserByEmail("emaildedono@mail.com")).thenReturn(Optional.of(owner));
+            productRepository.save(product);
+            this.product = product;
+        }
+        else {
+            this.product = existingProduct.get();
+        }
+
     }
 
     @AfterEach
     public void rollbackDatabase() {
-        categoryRepository.deleteAll();
+//        categoryRepository.deleteAll();
+//        productRepository.deleteAll();
+//        purchaseRepository.deleteAll();
+//        userRepository.deleteAll();
     }
 
     @Test
     @DisplayName("Redirects to payment gateway when stock accepted")
     public void test1() throws Exception {
-        Mockito.when(productRepository.findById(1L)).thenReturn(Optional.ofNullable(this.product));
-
-        Mockito.doAnswer(invocation -> {
-            Purchase purchase = invocation.<Purchase>getArgument(0);
-            ReflectionTestUtils.setField(purchase, "id", 1L);
-            return null;
-        }).when(purchaseRepository.save(Mockito.any(Purchase.class)));
-
+//        Mockito.when(productRepository.findById(1L)).thenReturn(Optional.ofNullable(this.product));
+//
+//        Mockito.doAnswer(invocation -> {
+//            this.purchase = invocation.getArgument(0);
+//            ReflectionTestUtils.setField(purchase, "id", 1L);
+//            return null;
+//        }).when(purchaseRepository).save(Mockito.any(Purchase.class));
+//
         PurchaseRequestDto request = new PurchaseRequestDto(1, 1L, PaymentGateway.PAG_SEGURO);
-
-        Mockito.when(purchaseRepository.save(Mockito.any(Purchase.class))).thenReturn(new Purchase(this.product, request.getQuantity(), this.user, PaymentGateway.PAYPAL));
+//
+//        Mockito.when(purchaseRepository.save(Mockito.any(Purchase.class)))
+//                .thenReturn(new Purchase(this.product, request.getQuantity(), this.user, PaymentGateway.PAG_SEGURO));
+//
         String address = Objects.requireNonNull(controller.create(request, uriComponentsBuilder).getBody()).toString();
 
         assertEquals("pagseguro.com/1?redirectUrl=http://localhost:8080/retorno-pagseguro", address);
 
         ArgumentCaptor<Purchase> purchaseArgument = ArgumentCaptor.forClass(Purchase.class);
 
-        //        Mockito.verify(email).purchase(purchaseArgument.capture()); // Testar envio de e-mail
+        //Mockito.verify(email).purchase(purchaseArgument.capture());  Testar envio de e-mail
 
         // TODO: Fazer esse teste passar
+    }
+
+    @Test
+    @DisplayName("Throws exception when stock is not available")
+    public void test2() throws BindException {
+
+        PurchaseRequestDto request = new PurchaseRequestDto(2, this.product.getId(), PaymentGateway.PAG_SEGURO);
+
+        assertThrows(BindException.class, () -> controller.create(request, uriComponentsBuilder));
     }
 }

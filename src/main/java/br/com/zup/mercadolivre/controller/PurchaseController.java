@@ -43,7 +43,7 @@ public class PurchaseController extends ObjectHandler {
             User customer = checkUserExists();
             PaymentGateway gateway = request.getGateway();
 
-            Purchase purchase = new Purchase(product, quantity, customer, request.getGateway());
+            Purchase purchase = new Purchase(product, quantity, customer, gateway);
             purchaseRepository.save(purchase);
             email.purchase(purchase);
 
