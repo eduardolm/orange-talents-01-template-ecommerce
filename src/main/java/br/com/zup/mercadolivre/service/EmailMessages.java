@@ -6,6 +6,7 @@ import br.com.zup.mercadolivre.model.ProductQuestion;
 import br.com.zup.mercadolivre.model.Purchase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 
@@ -52,7 +53,9 @@ public class EmailMessages {
                 "Ocorreu um erro com seu pagamento.",
                 "\nAcesse o link a seguir e faça o pagamento de sua compra.\n" +
                      "\n Entre em contato com o vendedor para combinar o envio do produto.\n" +
-                     "\nDados da compra: " + new PurchaseDto(purchase)
+                     "\nDados da compra: " + new PurchaseDto(purchase) +
+                     "\nLink para pagamento: " + purchase.getPaymentGateway()
+                        .createRedirectUrl(purchase, UriComponentsBuilder.newInstance())
         );
     }
 

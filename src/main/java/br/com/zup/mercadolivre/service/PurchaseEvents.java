@@ -10,14 +10,18 @@ import java.util.Set;
 public class PurchaseEvents {
 
     @Autowired
+    private EmailMessages email;
+
+    @Autowired
     private Set<PurchaseSuccessEvent> purchaseSuccessEvent;
 
     public void process(Purchase purchase) {
         if (purchase.successfullyProcessed()) {
             purchaseSuccessEvent.forEach(event -> event.process(purchase));
+            email.purchaseSuccess(purchase);
         }
         else {
-            // codigo
+            email.purchaseFailure(purchase);
         }
     }
 
