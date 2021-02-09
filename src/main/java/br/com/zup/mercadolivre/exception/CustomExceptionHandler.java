@@ -27,4 +27,20 @@ public class CustomExceptionHandler {
         globalErrors.forEach(notFoundErrors::addError);
         return notFoundErrors;
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalStateException.class)
+    public IllegalArgumentExceptionOutputDto handleIllegalArgumentErrors(IllegalStateException exception) {
+        List<String> globalErrors = new ArrayList<>();
+        globalErrors.add(exception.getMessage());
+
+        return buildIllegalArgumentError(globalErrors);
+    }
+
+    private IllegalArgumentExceptionOutputDto buildIllegalStateExceptionError(List<String> globalErrors) {
+        IllegalArgumentExceptionOutputDto notFoundErrors = new IllegalArgumentExceptionOutputDto();
+
+        globalErrors.forEach(notFoundErrors::addError);
+        return notFoundErrors;
+    }
 }

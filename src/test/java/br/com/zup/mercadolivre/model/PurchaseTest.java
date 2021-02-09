@@ -1,28 +1,38 @@
 package br.com.zup.mercadolivre.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
 import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
+import br.com.zup.mercadolivre.controller.request.PagSeguroRequestDto;
+import br.com.zup.mercadolivre.controller.request.PaymentGatewayResponseDto;
+import br.com.zup.mercadolivre.enums.PagSeguroReturnStatus;
 import br.com.zup.mercadolivre.enums.PaymentGateway;
+import br.com.zup.mercadolivre.enums.TransactionStatus;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
 import br.com.zup.mercadolivre.utils.builder.ProductBuilder;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Validator;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -39,6 +49,26 @@ public class PurchaseTest {
 
     @Autowired
     private Validator validator;
+
+    @Test
+    public void testConstructor() {
+        assertEquals("Purchase{id=null, product=null, quantity=0, customer=null, paymentGateway=null, transactions=[]}",
+                (new Purchase()).toString());
+    }
+
+    @Test
+    public void testConstructor2() {
+        Product product = new Product();
+
+        Purchase actualPurchase = new Purchase(product, 1, new User(), PaymentGateway.PAG_SEGURO);
+
+        assertEquals(
+                "Purchase{id=null, product=Produto{Id=null, Nome:'null', Quantidade:null, Descrição:'null', Preço:null,"
+                        + " Categoria:null, Proprietário:null, Características:{}, Imagens:[]}, quantity=1, customer=Usuário{id:null,"
+                        + " e-mail:'null', Cadastrado em:null}, paymentGateway=PAG_SEGURO, transactions=[]}",
+                actualPurchase.toString());
+        assertEquals(1, actualPurchase.getQuantity());
+    }
 
     @BeforeEach
     public void setup() {
@@ -65,7 +95,8 @@ public class PurchaseTest {
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
                 .withCategory(new Category("Celulares & Tablets"))
-                .withCharacteristics(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
+                .withCharacteristics(Lists.newArrayList(
+                        new CharacteristicsRequestDto("Peso", "145g"),
                         new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
@@ -79,17 +110,109 @@ public class PurchaseTest {
 
     @Test
     public void testToString() {
-        assertEquals("Purchase{Id:null, Produto:null, Quantidade:0, Comprador:null, Pagamento:null}",
+        assertEquals("Purchase{id=null, product=null, quantity=0, customer=null, paymentGateway=null, transactions=[]}",
                 (new Purchase()).toString());
+        assertEquals("Purchase{id=null, product=null, quantity=0, customer=null, paymentGateway=null, transactions=[]}",
+                (new Purchase()).toString());
+    }
+
+    @Test
+    public void testRedirectUrl() {
+        Product product = new Product();
+        Purchase purchase = new Purchase(product, 1, new User(), PaymentGateway.PAG_SEGURO);
+
+        assertEquals("pagseguro.com/null?redirectUrl=/retorno-pagseguro/",
+                purchase.redirectUrl(UriComponentsBuilder.newInstance()));
+    }
+
+    @Test
+    public void testAddTransaction() {
+        Purchase purchase = new Purchase();
+
+        purchase.addTransaction(new PagSeguroRequestDto("42", PagSeguroReturnStatus.SUCESSO));
+
+        assertEquals(1, purchase.getTransactions().size());
+    }
+
+    @Test
+    public void testSuccessfullyProcessed() {
+        assertFalse((new Purchase()).successfullyProcessed());
     }
 
     @Test
     public void shouldCreateNewPurchaseInstance() {
         Purchase purchase = new Purchase(this.product, 10, this.user, PaymentGateway.PAYPAL);
 
-        assertTrue(purchase instanceof Purchase);
+        assertTrue(true);
         assertEquals("Galaxy S20", purchase.getProduct().getName());
-        assertEquals(new BigDecimal( "2000"), purchase.getProduct().getPrice());
+        assertEquals(new BigDecimal("2000"), purchase.getProduct().getPrice());
+    }
+
+    @Test
+    @DisplayName("Should add a new transaction")
+    public void test1() {
+        Purchase newPurchase = newPurchase();
+        PaymentGatewayResponseDto paymentGatewayResponseDto = (purchase) ->
+                new Transaction(TransactionStatus.sucesso, "1", purchase);
+        newPurchase.addTransaction(paymentGatewayResponseDto);
+    }
+
+    @Test
+    @DisplayName("Should not accept two equal transactions")
+    public void test2() {
+        Purchase newPurchase = newPurchase();
+        PaymentGatewayResponseDto paymentGatewayResponseDto = (purchase) ->
+                new Transaction(TransactionStatus.erro, "1", purchase);
+
+        newPurchase.addTransaction(paymentGatewayResponseDto);
+
+        PaymentGatewayResponseDto paymentGatewayResponseDto2 = (purchase) ->
+                new Transaction(TransactionStatus.erro, "1", purchase);
+
+        assertThrows(IllegalStateException.class, () -> newPurchase.addTransaction(paymentGatewayResponseDto2));
+    }
+
+    @Test
+    @DisplayName("Should not accept transaction if purchase already processed")
+    public void test3() {
+        Purchase newPurchase = newPurchase();
+        PaymentGatewayResponseDto paymentGatewayResponseDto = (purchase) ->
+                new Transaction(TransactionStatus.sucesso, "1", purchase);
+
+        newPurchase.addTransaction(paymentGatewayResponseDto);
+
+        PaymentGatewayResponseDto paymentGatewayResponseDto2 = (purchase) ->
+                new Transaction(TransactionStatus.sucesso, "2", purchase);
+
+        assertThrows(IllegalStateException.class, () -> newPurchase.addTransaction(paymentGatewayResponseDto2));
+    }
+
+    @DisplayName("Should verify if purchase completed successfully")
+    @ParameterizedTest
+    @MethodSource("generatorTest4")
+    public void test4(boolean expectedResult, Collection<PaymentGatewayResponseDto> results) {
+        Purchase newPurchase = newPurchase();
+        results.forEach(newPurchase::addTransaction);
+
+        assertEquals(expectedResult, newPurchase.successfullyProcessed());
+    }
+
+    private static Stream<Arguments> generatorTest4() {
+        PaymentGatewayResponseDto successReturn1 = (purchase) ->
+                new Transaction(TransactionStatus.sucesso, "1", purchase);
+
+        PaymentGatewayResponseDto failureReturn1 = (purchase) ->
+                new Transaction(TransactionStatus.erro, "1", purchase);
+
+        return Stream.of(
+                Arguments.of(true, List.of(successReturn1)),
+                Arguments.of(false, List.of(failureReturn1)),
+                Arguments.of(false, List.of())
+        );
+    }
+
+    private Purchase newPurchase() {
+        return new Purchase(this.product, 10, this.user, PaymentGateway.PAYPAL);
     }
 }
 

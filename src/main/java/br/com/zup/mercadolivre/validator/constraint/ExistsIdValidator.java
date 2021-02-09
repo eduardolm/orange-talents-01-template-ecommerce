@@ -1,7 +1,6 @@
 package br.com.zup.mercadolivre.validator.constraint;
 
 import br.com.zup.mercadolivre.validator.ExistsId;
-import br.com.zup.mercadolivre.validator.UniqueValue;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;

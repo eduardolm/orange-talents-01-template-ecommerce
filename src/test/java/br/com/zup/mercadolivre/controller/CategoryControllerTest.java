@@ -3,7 +3,6 @@ package br.com.zup.mercadolivre.controller;
 import br.com.zup.mercadolivre.controller.request.CategoryRequestDto;
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,7 @@ public class CategoryControllerTest {
     @Test
     @WithMockUser(username = "user2@email.com", password = "pass1234")
     public void shouldCreateCategory() throws Exception {
-        CategoryRequestDto categoryRequestDto = new CategoryRequestDto("Test Category");
+        CategoryRequestDto categoryRequestDto = new CategoryRequestDto("Test Category1");
 
         mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
         Category category = categoryRequestDto.toModel(repository);
@@ -54,7 +53,7 @@ public class CategoryControllerTest {
                 .andExpect(status().isOk()).andReturn().getResponse();
 
         assertEquals(200, response.getStatus());
-        assertEquals("Test Category", mapper
+        assertEquals("Test Category1", mapper
                 .readValue(response.getContentAsString(), Category.class).getName());
     }
 }

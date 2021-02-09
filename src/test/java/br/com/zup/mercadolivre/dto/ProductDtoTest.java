@@ -2,6 +2,7 @@ package br.com.zup.mercadolivre.dto;
 
 import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
 import br.com.zup.mercadolivre.model.Category;
+import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
 import br.com.zup.mercadolivre.utils.builder.ProductBuilder;
@@ -62,7 +63,55 @@ public class ProductDtoTest {
     public void shouldStandardEmptyConstructorCreateANewInstance() {
         ProductDto productDto = new ProductDto();
 
-        assertTrue(productDto instanceof ProductDto);
+        assertTrue(true);
+    }
+
+    @Test
+    public void testConstructor() {
+        ProductDto actualProductDto = new ProductDto(new Product());
+
+        assertNull(actualProductDto.getName());
+        assertNull(actualProductDto.getPrice());
+        assertNull(actualProductDto.getId());
+        assertNull(actualProductDto.getQuantity());
+        assertNull(actualProductDto.getDescription());
+    }
+
+    @Test
+    public void testConstructor2() {
+        Product product = new Product();
+        product.setId(123L);
+
+        ProductDto actualProductDto = new ProductDto(product);
+
+        assertNull(actualProductDto.getName());
+        assertNull(actualProductDto.getPrice());
+        assertEquals(123L, actualProductDto.getId().longValue());
+        assertNull(actualProductDto.getQuantity());
+        assertNull(actualProductDto.getDescription());
+    }
+
+    @Test
+    public void testToString() {
+        assertEquals("ProductDto{Id:null, Nome:'null', Quantidade:null, Descrição:'null', Preço:null}",
+                (new ProductDto()).toString());
+    }
+
+    @Test
+    public void testEquals() {
+        assertNotEquals((new ProductDto()), "o");
+    }
+
+    @Test
+    public void testEquals2() {
+        ProductDto productDto = new ProductDto();
+
+        assertEquals(new ProductDto(), productDto);
+    }
+
+    @Test
+    public void testHashCode() {
+        assertEquals(0, (new ProductDto()).hashCode());
     }
 
     @Test

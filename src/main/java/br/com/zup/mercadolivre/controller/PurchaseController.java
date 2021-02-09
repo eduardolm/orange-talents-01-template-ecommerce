@@ -10,15 +10,15 @@ import br.com.zup.mercadolivre.repository.PurchaseRepository;
 import br.com.zup.mercadolivre.service.EmailMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import org.springframework.validation.BindException;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/v1/purchases")
@@ -43,7 +43,7 @@ public class PurchaseController extends ObjectHandler {
             User customer = checkUserExists();
             PaymentGateway gateway = request.getGateway();
 
-            Purchase purchase = new Purchase(product, quantity, customer, request.getGateway());
+            Purchase purchase = new Purchase(product, quantity, customer, gateway);
             purchaseRepository.save(purchase);
             email.purchase(purchase);
 

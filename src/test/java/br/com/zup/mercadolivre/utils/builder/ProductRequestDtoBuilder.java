@@ -2,11 +2,9 @@ package br.com.zup.mercadolivre.utils.builder;
 
 import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
 import br.com.zup.mercadolivre.controller.request.ProductRequestDto;
-import br.com.zup.mercadolivre.validator.CEP;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collector;
 
 public class ProductRequestDtoBuilder {
 
