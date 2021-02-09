@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
+@Table(name = "imagens_produtos")
 public class ProductImage {
 
     @Id
@@ -23,6 +24,7 @@ public class ProductImage {
     @URL(message = "Formato URL inválido.")
     @NotBlank(message = "Link para a imagem não pode ser vazio.")
     private String link;
+    private String originalFileName;
 
     @Deprecated
     public ProductImage() {}
@@ -68,5 +70,13 @@ public class ProductImage {
 
     public String getLink() {
         return link;
+    }
+
+    public String getOriginalFileName() {
+        return originalFileName;
+    }
+
+    public void setOriginalFileName(String originalFileName) {
+        this.originalFileName = originalFileName;
     }
 }

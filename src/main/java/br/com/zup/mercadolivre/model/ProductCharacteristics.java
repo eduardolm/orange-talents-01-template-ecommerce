@@ -6,7 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "carateristicas_produtos")
+@Table(name = "caracteristicas_produtos")
 public class ProductCharacteristics {
 
     @Id
@@ -58,7 +58,6 @@ public class ProductCharacteristics {
                 "Id:" + id +
                 ", Nome:'" + name + '\'' +
                 ", Descrição:'" + description + '\'' +
-                ", Produto:" + product +
                 '}';
     }
 

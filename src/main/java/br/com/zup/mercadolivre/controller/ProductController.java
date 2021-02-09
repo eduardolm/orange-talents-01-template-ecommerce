@@ -12,6 +12,7 @@ import br.com.zup.mercadolivre.repository.ProductRepository;
 import br.com.zup.mercadolivre.repository.UserRepository;
 import br.com.zup.mercadolivre.service.ProductImageService;
 import br.com.zup.mercadolivre.validator.SameNameCharacteristicsValidator;
+import io.jsonwebtoken.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,7 +78,8 @@ public class ProductController {
 
     @PostMapping("{id}/images")
     @Transactional
-    public ResponseEntity<?> upload(@PathVariable("id") Long id, @Valid ProductImageRequestDto requestDto) throws IOException {
+    public ResponseEntity<?> upload(@PathVariable("id") Long id,
+                                    @Valid ProductImageRequestDto requestDto) throws IOException {
 
         User loggedUser = checkUserExists();
         Product product = checkProductExists(id);
@@ -85,8 +87,11 @@ public class ProductController {
         if (!product.belongsToUser(loggedUser)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+
         Set<String> uploadedLinks = imageService.uploadImage(requestDto, product);
-        product.associateImages(uploadedLinks);
+        Assert.notNull(uploadedLinks, "Imagens já existem em nosso banco de dados.");
+
+        product.addImages(uploadedLinks);
         productRepository.save(product);
         return ResponseEntity.ok().build();
     }
@@ -120,5 +125,4 @@ public class ProductController {
     private String getAuthenticatedUser() {
         return authenticationFacade.getAuthentication().getName();
     }
-
 }

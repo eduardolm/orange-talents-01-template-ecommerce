@@ -7,4 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Repository
 public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
+
+    ProductImage findByOriginalFileName(String name);
 }

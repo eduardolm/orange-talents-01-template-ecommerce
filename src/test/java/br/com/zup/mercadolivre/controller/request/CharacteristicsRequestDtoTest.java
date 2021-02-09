@@ -1,10 +1,10 @@
 package br.com.zup.mercadolivre.controller.request;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.ProductCharacteristics;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CharacteristicsRequestDtoTest {
     @Test
@@ -22,9 +22,7 @@ public class CharacteristicsRequestDtoTest {
 
         assertEquals("Name", actualToModelResult.getName());
         assertEquals("The characteristics of someone or something", actualToModelResult.getDescription());
-        assertEquals("ProductCharacteristics{Id:null, Nome:'Name', Descrição:'The characteristics of " +
-                "someone or something', Produto:Produto{Id:null, nome:'null', Quantidade:null, Descrição:'null', " +
-                "Preço:null, Categoria:null, Proprietário:null, Características:{}, Imagens:[]}}",
+        assertEquals("ProductCharacteristics{Id:null, Nome:'Name', Descrição:'The characteristics of someone or something'}",
                 actualToModelResult.toString());
     }
 
