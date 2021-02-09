@@ -28,11 +28,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -66,43 +63,6 @@ public class ProductControllerTest {
         categoryRepository.deleteAll();
         userRepository.deleteAll();
     }
-
-    @Test
-    @WithMockUser(username = "user@email.com", password = "pass1234")
-    public void shouldListProducts() throws Exception {
-
-        User user = new UserBuilder().withEmail("user@email.com").withPassword("pass1234").build();
-        userRepository.save(user);
-        this.user = user;
-
-        Category category = new Category("teste");
-        categoryRepository.save(category);
-        this.category = category;
-
-        ProductRequestDto productRequestDto = new ProductRequestDtoBuilder()
-                .withName("Galaxy S20")
-                .withQuantity(100)
-                .withDescription("Celular top da categoria")
-                .withPrice(new BigDecimal("2000"))
-                .withCategory(this.category.getId())
-                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
-                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
-                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
-                .build();
-
-        Product product = productRequestDto.toModel(categoryRepository, user);
-        repository.save(product);
-        mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
-
-        doReturn(Lists.newArrayList(product)).when(repository).findAll();
-
-        mockMvc.perform(get("/api/v1/products"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-    }
-
-    // TODO: Corrigir este teste de criação do produto
 
     @Test
     @WithMockUser(username = "user@email.com", password = "pass1234")
