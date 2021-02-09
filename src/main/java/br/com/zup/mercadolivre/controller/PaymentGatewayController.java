@@ -3,6 +3,7 @@ package br.com.zup.mercadolivre.controller;
 import br.com.zup.mercadolivre.controller.request.PagSeguroRequestDto;
 import br.com.zup.mercadolivre.controller.request.PaymentGatewayResponseDto;
 import br.com.zup.mercadolivre.controller.request.PaypalRequestDto;
+import br.com.zup.mercadolivre.dto.PurchaseDto;
 import br.com.zup.mercadolivre.model.Purchase;
 import br.com.zup.mercadolivre.repository.PurchaseRepository;
 import br.com.zup.mercadolivre.service.PurchaseEvents;
@@ -47,7 +48,7 @@ public class PaymentGatewayController {
             purchaseRepository.save(purchase.get());
             purchaseEvents.process(purchase.get());
 
-            return ResponseEntity.ok().body(purchase.toString());
+            return ResponseEntity.ok().body(new PurchaseDto(purchase.get()));
         }
 
         BindException purchaseIssue = new BindException(paymentGatewayResponseDto, "paymentGatewayResponseDto");

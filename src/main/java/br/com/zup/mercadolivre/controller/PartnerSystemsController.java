@@ -13,7 +13,7 @@ public class PartnerSystemsController {
 
     @PostMapping("/api/v1/notas-fiscais")
     public void createInvoice(@RequestBody @Valid NFRequestDto request) throws InterruptedException {
-        System.out.println("Criando nota fiscal para " + request.getPurchaseId() + " do comprador " + request.getCustomerId());
+        System.out.println("Criando nota fiscal para a venda:  " + request.getPurchaseId() + " do comprador " + request.getCustomerId());
         Thread.sleep(150);;
     }
 
