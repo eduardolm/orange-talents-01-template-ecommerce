@@ -2,10 +2,9 @@ package br.com.zup.mercadolivre.dto;
 
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
+import br.com.zup.mercadolivre.model.ProductImage;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,9 +18,9 @@ public class ProductDetailDto {
     private Category category;
     private UserDto productOwner;
     private Set<ProductCharacteristicsDto> characteristics;
+    private Set<String> images;
 
     public ProductDetailDto(Product product) {
-        List<ProductCharacteristicsDto> tempList = new ArrayList<>();
         this.id = product.getId();
         this.name = product.getName();
         this.quantity = product.getQuantity();
@@ -30,6 +29,7 @@ public class ProductDetailDto {
         this.category = product.getCategory();
         this.productOwner = new UserDto(product.getProductOwner());
         this.characteristics = product.getCharacteristics().stream().map(ProductCharacteristicsDto::new).collect(Collectors.toSet());
+        this.images = product.getImages().stream().map(ProductImage::getLink).collect(Collectors.toSet());
     }
 
     public Long getId() {
@@ -62,5 +62,9 @@ public class ProductDetailDto {
 
     public Set<ProductCharacteristicsDto> getCharacteristics() {
         return characteristics;
+    }
+
+    public Set<String> getImages() {
+        return images;
     }
 }

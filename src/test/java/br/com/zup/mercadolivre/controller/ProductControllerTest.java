@@ -1,5 +1,6 @@
 package br.com.zup.mercadolivre.controller;
 
+import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
 import br.com.zup.mercadolivre.controller.request.ProductRequestDto;
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
@@ -55,10 +56,14 @@ public class ProductControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
+    private Category category;
+
     @BeforeEach
     public void setup() {
-        Category category = new CategoryBuilder().withName("Celulares & Tablets").build();
-        Mockito.when(categoryRepository.findById(1L)).thenReturn(Optional.ofNullable(category));
+        Category category = new Category("Celulares & Tablets");
+        category.setId(1L);
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
+        this.category = category;
     }
 
     @AfterEach
@@ -67,7 +72,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "user2@email.com", password = "pass1234")
+    @WithMockUser(username = "user@email.com", password = "pass1234")
     public void shouldListProducts() throws Exception {
 
         User user = new UserBuilder().withEmail("user2@email.com").withPassword("pass1234").build();
@@ -77,7 +82,10 @@ public class ProductControllerTest {
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(1L)
+                .withCategory(category.getId())
+                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
+                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
+                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
         Product product = productRequestDto.toModel(categoryRepository, user);
@@ -95,7 +103,7 @@ public class ProductControllerTest {
     // TODO: Corrigir este teste de criação do produto
 
     @Test
-    @WithMockUser(username = "user2@email.com", password = "pass1234")
+    @WithMockUser(username = "user@email.com", password = "pass1234")
     public void shouldCreateProduct() throws Exception {
         User user = new UserBuilder().withEmail("user2@email.com").withPassword("pass1234").build();
         ProductRequestDto productRequestDto = new ProductRequestDtoBuilder()
@@ -103,7 +111,10 @@ public class ProductControllerTest {
                 .withQuantity(100)
                 .withDescription("Celular top da categoria")
                 .withPrice(new BigDecimal("2000"))
-                .withCategory(1L)
+                .withCategory(category.getId())
+                .withCharacteristcs(Lists.newArrayList(new CharacteristicsRequestDto("Peso", "145g"),
+                        new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
+                        new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
 
         mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);

@@ -20,7 +20,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = true)
@@ -42,6 +42,10 @@ public class Product {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<ProductCharacteristics> characteristics = new HashSet<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Set<ProductImage> images = new HashSet<>();
+
     public Product(String name,
                    Integer quantity,
                    String description,
@@ -61,7 +65,7 @@ public class Product {
                 .collect(Collectors.toSet());
         this.characteristics.addAll(newCharacteristics);
 
-        Assert.isTrue(this.characteristics.size() >= 3, "Todo produto precisa ter no mínimo 3 catacterísticas.");
+        Assert.isTrue(this.characteristics.size() >= 3, "Todo produto precisa ter no mínimo 3 características.");
     }
 
     @Deprecated
@@ -102,17 +106,27 @@ public class Product {
         return characteristics;
     }
 
+    public Set<ProductImage> getImages() {
+        return images;
+    }
+
+    public void setImages(Set<ProductImage> images) {
+        this.images = images;
+    }
+
     @Override
     public String toString() {
-        return "Product{" +
-                "Id" + id +
-                ", Nome:'" + name + '\'' +
+        return "Produto{" +
+                "Id:" + id +
+                ", nome:'" + name + '\'' +
                 ", Quantidade:" + quantity +
                 ", Descrição:'" + description + '\'' +
                 ", Preço:" + price +
                 ", Categoria:" + category +
-                ", DonoProduto:" + productOwner +
-                ", Características:" + characteristics +
+                ", Proprietário:" + productOwner +
+                ", Características:" + getCharacteristics().stream()
+                .collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription)) +
+                ", Imagens:" + getImages().stream().collect(Collectors.toSet()) +
                 '}';
     }
 
@@ -139,5 +153,17 @@ public class Product {
         result = 31 * result + getPrice().hashCode();
         result = 31 * result + getProductOwner().hashCode();
         return result;
+    }
+
+    public void associateImages(Set<String> links) {
+        Set<ProductImage> images = links.stream()
+                .map(link -> new ProductImage(this, link))
+                .collect(Collectors.toSet());
+
+        this.images.addAll(images);
+    }
+
+    public boolean belongsToUser(User tempOwner) {
+        return this.productOwner.equals(tempOwner);
     }
 }
