@@ -3,9 +3,12 @@ package br.com.zup.mercadolivre.dto;
 import br.com.zup.mercadolivre.model.Category;
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.ProductImage;
+import br.com.zup.mercadolivre.model.ProductQuestion;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 public class ProductDetailDto {
@@ -19,6 +22,7 @@ public class ProductDetailDto {
     private UserDto productOwner;
     private Set<ProductCharacteristicsDto> characteristics;
     private Set<String> images;
+    private SortedSet<String> questions;
     private Set<ProductReviewDto> reviews;
 
     public ProductDetailDto(Product product) {
@@ -31,6 +35,7 @@ public class ProductDetailDto {
         this.productOwner = new UserDto(product.getProductOwner());
         this.characteristics = product.getCharacteristics().stream().map(ProductCharacteristicsDto::new).collect(Collectors.toSet());
         this.images = product.getImages().stream().map(ProductImage::getLink).collect(Collectors.toSet());
+        this.questions = product.mapProductQuestions(ProductQuestion::getTitle);
         this.reviews = product.getProductReviews().stream().map(ProductReviewDto::new).collect(Collectors.toSet());
     }
 
@@ -68,6 +73,10 @@ public class ProductDetailDto {
 
     public Set<ProductReviewDto> getReviews() {
         return reviews;
+    }
+
+    public SortedSet<String> getQuestions() {
+        return questions;
     }
 
     public Set<String> getImages() {

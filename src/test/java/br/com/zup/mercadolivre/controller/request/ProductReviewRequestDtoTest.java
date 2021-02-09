@@ -19,10 +19,10 @@ public class ProductReviewRequestDtoTest {
         assertEquals(1, actualToModelResult.getGrade().intValue());
         assertEquals("Super", actualToModelResult.getTitle());
         assertEquals("Test description", actualToModelResult.getDescription());
-        assertEquals("ProductReview{Id:null, Nota:1, Titulo:'Dr', Descrição:'The characteristics of someone or something',"
-                + " Produto:Produto{Id=null, Nome:'null', Quantidade:null, Descrição:'null', Preço:null, Categoria:null,"
-                + " Proprietário:null, Características:{}, Imagens:[], Opiniões:[]}, Cliente:Usuário{id:null, e-mail:'null',"
-                + " Cadastrado em:null}}", actualToModelResult.toString());
+        assertEquals("ProductReview{Id:null, Nota:1, Titulo:'Super', Descrição:'Test description', " +
+                "Produto:Produto{Id=null, Nome:'null', Quantidade:null, Descrição:'null', Preço:null," +
+                " Categoria:null, Proprietário:null, Características:{}, Imagens:[], Opiniões:[]}, " +
+                "Cliente:Usuário{id:null, e-mail:'null', Cadastrado em:null}}", actualToModelResult.toString());
     }
 }
 

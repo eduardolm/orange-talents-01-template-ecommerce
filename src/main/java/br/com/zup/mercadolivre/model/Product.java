@@ -8,9 +8,8 @@ import io.jsonwebtoken.lang.Assert;
 import javax.persistence.*;
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Entity
@@ -49,6 +48,10 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
     private Set<ProductReview> productReviews = new HashSet<>();
+
+    @OneToMany(mappedBy = "product")
+    @OrderBy("title asc")
+    private SortedSet<ProductQuestion> questions = new TreeSet<>();
 
     public Product(String name,
                    Integer quantity,
@@ -114,6 +117,10 @@ public class Product {
         return images;
     }
 
+    public SortedSet<ProductQuestion> getQuestions() {
+        return questions;
+    }
+
     public Set<ProductReview> getProductReviews() {
         return productReviews;
     }
@@ -174,5 +181,10 @@ public class Product {
 
     public boolean belongsToUser(User tempOwner) {
         return this.productOwner.equals(tempOwner);
+    }
+
+    public <T extends Comparable<T>> SortedSet<T> mapProductQuestions(Function<ProductQuestion, T> mapperFunction) {
+        return this.questions.stream().map(mapperFunction)
+                .collect(Collectors.toCollection(TreeSet :: new));
     }
 }

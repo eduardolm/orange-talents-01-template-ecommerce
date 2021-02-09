@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -20,10 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ProductImageService {
@@ -42,9 +38,8 @@ public class ProductImageService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductImageService.class);
 
-    public Set<String> uploadImage(ProductImageRequestDto requestDto, Product product) throws IOException {
+    public Set<String> uploadImage(ProductImageRequestDto requestDto, Product product) throws IOException, Exception {
 
-        JSONObject response = new JSONObject();
         Set<String> links = new HashSet<>();
         try {
             for (MultipartFile image : requestDto.getImages()) {
@@ -63,11 +58,20 @@ public class ProductImageService {
         catch (IOException ex) {
             LOGGER.error("Erro ao enviar arquivo para a nuvem", ex);
         }
+        catch (Exception ex1) {
+            LOGGER.error("Erro desconhecido.", ex1);
+        }
         return links;
     }
 
     private boolean preventRepeatedImages(File file) {
-        return imageRepository.findByOriginalFileName(file.getName()).getOriginalFileName().equals(file.getName());
+        Optional<ProductImage> image = imageRepository.findByOriginalFileName(file.getName());
+
+        if (image.isPresent()) {
+            String originalName = image.get().getOriginalFileName();
+            return originalName.equals(file.getName());
+        }
+        return false;
     }
 
     public String createBucket(){
