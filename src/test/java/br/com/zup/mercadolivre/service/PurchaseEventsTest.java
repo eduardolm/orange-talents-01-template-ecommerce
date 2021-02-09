@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 public class PurchaseEventsTest {
 
     @Autowired
-    private PurchaseEvents purchaseEvents;
+    private PurchaseEvents purchaseEvents = Mockito.mock(PurchaseEvents.class);
 
     @Test
     @DisplayName("Should trigger success events")
@@ -28,7 +28,6 @@ public class PurchaseEventsTest {
         Purchase purchase = TestBuilders.PurchaseFixture.newPurchase().finished();
         PurchaseSuccessEvent successEvent = Mockito.mock(PurchaseSuccessEvent.class);
         Set<PurchaseSuccessEvent> events = Set.of(successEvent);
-        PurchaseEvents purchaseEvents = new PurchaseEvents();
         purchaseEvents.setPurchaseSuccessEvent(events);
 
         purchaseEvents.process(purchase);
@@ -51,7 +50,6 @@ public class PurchaseEventsTest {
         Purchase purchase = TestBuilders.PurchaseFixture.newPurchase().paymentFailure();
         PurchaseSuccessEvent successEvent = Mockito.mock(PurchaseSuccessEvent.class);
         Set<PurchaseSuccessEvent> events = Set.of(successEvent);
-        PurchaseEvents purchaseEvents = new PurchaseEvents();
         purchaseEvents.setPurchaseSuccessEvent(events);
 
         purchaseEvents.process(purchase);

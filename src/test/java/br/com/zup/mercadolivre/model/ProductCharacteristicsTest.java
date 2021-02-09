@@ -27,23 +27,7 @@ public class ProductCharacteristicsTest {
         ProductCharacteristics productCharacteristics = new ProductCharacteristics("Name",
                 "The characteristics of someone or something", new Product());
 
-        assertNotEquals(new ProductCharacteristics(), productCharacteristics);
-    }
-
-    @Test
-    public void testEquals3() {
-        ProductCharacteristics productCharacteristics = new ProductCharacteristics("Name",
-                "The characteristics of someone or something", new Product());
-
         assertEquals(new ProductCharacteristics("Name", "The characteristics of someone or something", new Product()), productCharacteristics);
-    }
-
-    @Test
-    public void testEquals4() {
-        ProductCharacteristics productCharacteristics = new ProductCharacteristics("Name",
-                "The characteristics of someone or something", new Product());
-
-        assertNotEquals(new ProductCharacteristics(), productCharacteristics);
     }
 
     @Test
