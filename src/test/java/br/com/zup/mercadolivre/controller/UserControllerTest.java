@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,12 +18,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -34,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 public class UserControllerTest {
 
@@ -87,9 +85,49 @@ public class UserControllerTest {
 
         when(repository.save(user)).thenReturn(user);
 
-        var response = mockMvc.perform(post("/api/v1/users")
+        mockMvc.perform(post("/api/v1/users")
                 .content(mapper.writeValueAsString(userRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn().getResponse();
+    }
+
+    @Test
+    public void shouldNotCreateUserWhenEmailIsNull() throws Exception {
+        UserRequestDto userRequestDto = new UserRequestDtoBuilder()
+                .withEmail(null)
+                .withPassword("pass1234")
+                .build();
+
+        mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+        User user = userRequestDto.toModel(encoder);
+
+        when(repository.save(user)).thenReturn(user);
+
+        mockMvc.perform(post("/api/v1/users")
+                .content(mapper.writeValueAsString(userRequestDto))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        assertTrue(repository.findAll().isEmpty());
+    }
+
+    @Test
+    public void shouldNotCreateUserWhenPasswordIsNull() throws Exception {
+        UserRequestDto userRequestDto = new UserRequestDtoBuilder()
+                .withEmail("user2@email.com")
+                .withPassword("")
+                .build();
+
+        mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+        User user = userRequestDto.toModel(encoder);
+
+        when(repository.save(user)).thenReturn(user);
+
+        mockMvc.perform(post("/api/v1/users")
+                .content(mapper.writeValueAsString(userRequestDto))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        assertTrue(repository.findAll().isEmpty());
     }
 }

@@ -1,15 +1,16 @@
 package br.com.zup.mercadolivre.model;
 
 import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
-import br.com.zup.mercadolivre.dto.ProductCharacteristicsDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.lang.Assert;
 
 import javax.persistence.*;
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Entity
@@ -20,7 +21,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = true)
@@ -42,6 +43,17 @@ public class Product {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<ProductCharacteristics> characteristics = new HashSet<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Set<ProductImage> images = new HashSet<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
+    private Set<ProductReview> productReviews = new HashSet<>();
+
+    @OneToMany(mappedBy = "product")
+    @OrderBy("title asc")
+    private SortedSet<ProductQuestion> questions = new TreeSet<>();
+
     public Product(String name,
                    Integer quantity,
                    String description,
@@ -61,7 +73,7 @@ public class Product {
                 .collect(Collectors.toSet());
         this.characteristics.addAll(newCharacteristics);
 
-        Assert.isTrue(this.characteristics.size() >= 3, "Todo produto precisa ter no mínimo 3 catacterísticas.");
+        Assert.isTrue(this.characteristics.size() >= 3, "Todo produto precisa ter no mínimo 3 características.");
     }
 
     @Deprecated
@@ -102,17 +114,35 @@ public class Product {
         return characteristics;
     }
 
+    public Set<ProductImage> getImages() {
+        return images;
+    }
+
+    public SortedSet<ProductQuestion> getQuestions() {
+        return questions;
+    }
+
+    public void setImages(Set<ProductImage> images) {
+        this.images = images;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
-        return "Product{" +
-                "Id" + id +
+        return "Produto{" +
+                "Id=" + id +
                 ", Nome:'" + name + '\'' +
                 ", Quantidade:" + quantity +
                 ", Descrição:'" + description + '\'' +
                 ", Preço:" + price +
                 ", Categoria:" + category +
-                ", DonoProduto:" + productOwner +
-                ", Características:" + characteristics +
+                ", Proprietário:" + productOwner +
+                ", Características:" + getCharacteristics().stream()
+                .collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription)) +
+                ", Imagens:" + getImages().stream().collect(Collectors.toSet()) +
                 '}';
     }
 
@@ -139,5 +169,51 @@ public class Product {
         result = 31 * result + getPrice().hashCode();
         result = 31 * result + getProductOwner().hashCode();
         return result;
+    }
+
+    public void addImages(Set<String> links) {
+        Set<ProductImage> images = links.stream()
+                .map(link -> new ProductImage(this, link))
+                .collect(Collectors.toSet());
+
+        this.images.addAll(images);
+    }
+
+    public boolean belongsToUser(User tempOwner) {
+        return this.productOwner.equals(tempOwner);
+    }
+
+    public <T extends Comparable<T>> SortedSet<T> mapQuestions(Function<ProductQuestion, T> mapperFunction) {
+        return this.questions.stream().map(mapperFunction)
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    public <T> Set<T> mapCharacteristics(Function<ProductCharacteristics, T> mapperFunction) {
+        return this.characteristics
+                .stream()
+                .map(mapperFunction)
+                .collect(Collectors.toSet());
+    }
+
+    public <T> Set<T> mapImages(Function<ProductImage, T> mapperFunction) {
+        return this.images
+                .stream()
+                .map(mapperFunction)
+                .collect(Collectors.toSet());
+    }
+
+    public Reviews getReviews() {
+        return new Reviews(this.productReviews);
+    }
+
+    public boolean subtractStock(@Positive int quantity) {
+        Assert.isTrue(quantity > 0, "A quantidade deve ser maior que zero para que a compra " +
+                "possa ser realizada: " + quantity);
+
+        if (quantity <= this.quantity) {
+            this.quantity -= quantity;
+            return true;
+        }
+        return false;
     }
 }

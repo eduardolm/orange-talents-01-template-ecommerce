@@ -1,12 +1,8 @@
 package br.com.zup.mercadolivre.dto;
 
 import br.com.zup.mercadolivre.model.Product;
-import br.com.zup.mercadolivre.model.ProductCharacteristics;
 
 import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ProductDto {
 
@@ -15,9 +11,6 @@ public class ProductDto {
     private Integer quantity;
     private String description;
     private BigDecimal price;
-    private String category;
-    private String productOwner;
-    private Map<String, String> characteristics;
 
     @Deprecated
     public ProductDto() {
@@ -29,10 +22,6 @@ public class ProductDto {
         this.quantity = product.getQuantity();
         this.description = product.getDescription();
         this.price = product.getPrice();
-        this.category = product.getCategory().getName();
-        this.productOwner = product.getProductOwner().getEmail();
-//        this.characteristics = product.getCharacteristics().stream().map(item -> new ProductCharacteristicsDto(item).getName()).collect(Collectors.toSet());
-        this.characteristics = product.getCharacteristics().stream().collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription));
     }
 
     public Long getId() {
@@ -55,15 +44,32 @@ public class ProductDto {
         return price;
     }
 
-    public String getCategory() {
-        return category;
+    @Override
+    public String toString() {
+        return "ProductDto{" +
+                "Id:" + id +
+                ", Nome:'" + name + '\'' +
+                ", Quantidade:" + quantity +
+                ", Descrição:'" + description + '\'' +
+                ", Preço:" + price +
+                '}';
     }
 
-    public String getProductOwner() {
-        return productOwner;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ProductDto)) return false;
+
+        ProductDto that = (ProductDto) o;
+
+        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;
+        return getDescription() != null ? getDescription().equals(that.getDescription()) : that.getDescription() == null;
     }
 
-    public Map<String, String> getCharacteristics() {
-        return characteristics;
+    @Override
+    public int hashCode() {
+        int result = getName() != null ? getName().hashCode() : 0;
+        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
+        return result;
     }
 }

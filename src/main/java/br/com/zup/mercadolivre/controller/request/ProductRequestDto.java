@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class ProductRequestDto {
 
     @NotBlank(message = "O nome é obrigatório.")
-    @UniqueValue(domainClass = Product.class, fieldName = "name")
+    @UniqueValue(domainClass = Product.class, fieldName = "name", message = "Produto já cadastrado.")
     private String name;
 
     @NotNull(message = "A quantidade é obrigatória.")

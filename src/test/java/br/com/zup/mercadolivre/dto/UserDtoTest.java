@@ -14,6 +14,22 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 public class UserDtoTest {
     @Test
+    public void testConstructor() {
+        UserDto actualUserDto = new UserDto(new User());
+
+        assertNull(actualUserDto.getEmail());
+        assertNull(actualUserDto.getId());
+    }
+
+    @Test
+    public void testConstructor2() {
+        UserDto actualUserDto = new UserDto(new User("Email", "iloveyou"));
+
+        assertEquals("Email", actualUserDto.getEmail());
+        assertNull(actualUserDto.getId());
+    }
+
+    @Test
     public void shouldCreateUserDtoInstance() {
         UserDto actualUserDto = new UserDto(new User());
 
