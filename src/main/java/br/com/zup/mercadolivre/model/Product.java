@@ -7,6 +7,7 @@ import io.jsonwebtoken.lang.Assert;
 
 import javax.persistence.*;
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
@@ -121,10 +122,6 @@ public class Product {
         return questions;
     }
 
-    public Set<ProductReview> getProductReviews() {
-        return productReviews;
-    }
-
     public void setImages(Set<ProductImage> images) {
         this.images = images;
     }
@@ -142,7 +139,6 @@ public class Product {
                 ", Características:" + getCharacteristics().stream()
                 .collect(Collectors.toMap(ProductCharacteristics::getName, ProductCharacteristics::getDescription)) +
                 ", Imagens:" + getImages().stream().collect(Collectors.toSet()) +
-                ", Opiniões:" + getProductReviews().stream().collect(Collectors.toSet()) +
                 '}';
     }
 
@@ -183,8 +179,37 @@ public class Product {
         return this.productOwner.equals(tempOwner);
     }
 
-    public <T extends Comparable<T>> SortedSet<T> mapProductQuestions(Function<ProductQuestion, T> mapperFunction) {
+    public <T extends Comparable<T>> SortedSet<T> mapQuestions(Function<ProductQuestion, T> mapperFunction) {
         return this.questions.stream().map(mapperFunction)
-                .collect(Collectors.toCollection(TreeSet :: new));
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    public <T> Set<T> mapCharacteristics(Function<ProductCharacteristics, T> mapperFunction) {
+        return this.characteristics
+                .stream()
+                .map(mapperFunction)
+                .collect(Collectors.toSet());
+    }
+
+    public <T> Set<T> mapImages(Function<ProductImage, T> mapperFunction) {
+        return this.images
+                .stream()
+                .map(mapperFunction)
+                .collect(Collectors.toSet());
+    }
+
+    public Reviews getReviews() {
+        return new Reviews(this.productReviews);
+    }
+
+    public boolean subtractStock(@Positive int quantity) {
+        Assert.isTrue(quantity > 0, "A quantidade deve ser maior que zero para que a compra " +
+                "possa ser realizada: " + quantity);
+
+        if (quantity <= this.quantity) {
+            this.quantity -= quantity;
+            return true;
+        }
+        return false;
     }
 }
