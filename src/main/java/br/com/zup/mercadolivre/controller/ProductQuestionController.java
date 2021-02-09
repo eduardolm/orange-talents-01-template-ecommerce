@@ -38,5 +38,4 @@ public class ProductQuestionController extends ObjectHandler {
 
         return ResponseEntity.ok().body(new ProductQuestionDto(productQuestion));
     }
-
 }
