@@ -3,7 +3,6 @@ package br.com.zup.mercadolivre.controller;
 import br.com.zup.mercadolivre.controller.request.ProductImageRequestDto;
 import br.com.zup.mercadolivre.controller.request.ProductRequestDto;
 import br.com.zup.mercadolivre.dto.ProductDetailDto;
-import br.com.zup.mercadolivre.dto.ProductDto;
 import br.com.zup.mercadolivre.handler.ObjectHandler;
 import br.com.zup.mercadolivre.model.Product;
 import br.com.zup.mercadolivre.model.User;
@@ -20,10 +19,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -48,21 +45,6 @@ public class ProductController extends ObjectHandler {
         return ResponseEntity.ok(new ProductDetailDto(productRepository.save(product)));
     }
 
-    @GetMapping
-    public ResponseEntity<?> findAll() {
-        List<Product> products = productRepository.findAll();
-        return ResponseEntity.ok().body(products.stream().map(ProductDto::new).collect(Collectors.toList()));
-    }
-
-    @GetMapping("{id}")
-    public ResponseEntity<?> findById(@PathVariable() Long id) {
-        Optional<Product> product = productRepository.findById(id);
-        if (product.isPresent()) {
-            return ResponseEntity.ok().body(new ProductDetailDto(product.get()));
-        }
-        return ResponseEntity.notFound().build();
-    }
-
     @PostMapping("{id}/images")
     @Transactional
     public ResponseEntity<?> upload(@PathVariable("id") Long id,
@@ -83,9 +65,13 @@ public class ProductController extends ObjectHandler {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("{id}/image/list")
-    public ResponseEntity<?> listBuckets() {
-        imageService.listBuckets();
-        return ResponseEntity.ok().build();
+
+    @GetMapping("{id}")
+    public ResponseEntity<?> findById(@PathVariable() Long id) {
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent()) {
+            return ResponseEntity.ok().body(new ProductDetailDto(product.get()));
+        }
+        return ResponseEntity.notFound().build();
     }
 }

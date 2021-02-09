@@ -1,4 +1,7 @@
-# API que simula o backend do Mercadolivre.
+# Mercadolivre - API
+![Version](src/main/resources/static/img/version.svg)
+![License](src/main/resources/static/img/license.svg)
+![Coverage](src/main/resources/static/img/coverage.svg)
 
 ## Objetivos
 Desenvolver uma API que simula o backend do Mercadolivre.
