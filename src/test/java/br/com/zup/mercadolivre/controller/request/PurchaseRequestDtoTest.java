@@ -1,30 +1,38 @@
-package br.com.zup.mercadolivre.model;
+package br.com.zup.mercadolivre.controller.request;
 
-import br.com.zup.mercadolivre.controller.request.CharacteristicsRequestDto;
+import br.com.zup.mercadolivre.enums.PaymentGateway;
+import br.com.zup.mercadolivre.model.Category;
+import br.com.zup.mercadolivre.model.Product;
+import br.com.zup.mercadolivre.model.User;
 import br.com.zup.mercadolivre.repository.CategoryRepository;
 import br.com.zup.mercadolivre.utils.builder.ProductBuilder;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.validation.Valid;
+import javax.validation.Validator;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class ProductReviewTest {
+public class PurchaseRequestDtoTest {
 
     @MockBean
     private CategoryRepository categoryRepository;
@@ -33,6 +41,9 @@ public class ProductReviewTest {
     private Category category;
     private Product product;
     private Collection<CharacteristicsRequestDto> characteristics;
+
+    @Autowired
+    private Validator validator;
 
     @BeforeEach
     public void setup() {
@@ -63,6 +74,7 @@ public class ProductReviewTest {
                         new CharacteristicsRequestDto("Conectividade", "5G, Wi-Fi, Bluetooth"),
                         new CharacteristicsRequestDto("Itens incluídos", "Celular, carregador, cabo mini usb")))
                 .build();
+        this.product.setId(1L);
     }
 
     @AfterEach
@@ -71,27 +83,32 @@ public class ProductReviewTest {
     }
 
     @Test
-    public void shouldCreateNewProductReviewInstance() {
-        ProductReview productReview = new ProductReview();
+    public void shouldCreateNewPurchaseRequestDtoInstance() {
+        PurchaseRequestDto purchaseRequestDto = new PurchaseRequestDto(10, this.product.getId(), PaymentGateway.PAG_SEGURO);
 
-        assertTrue(productReview instanceof ProductReview);
+        assertTrue(purchaseRequestDto instanceof PurchaseRequestDto);
     }
 
     @Test
-    public void shouldOverloadedConstructorCreateProductReviewInstance() {
-        ProductReview productReview = new ProductReview(3, "Bom produto", "Produto atende as " +
-                "expectativas", product, user);
+    public void shouldReturnErrorIfQuantityLesserOrEqualsZero() {
+        PurchaseRequestDto purchaseRequestDto = new PurchaseRequestDto( -20, this.product.getId(), PaymentGateway.PAG_SEGURO);
+        PurchaseRequestDto purchaseRequestDto2 = new PurchaseRequestDto( 0, this.product.getId(), PaymentGateway.PAG_SEGURO);
 
-        assertTrue(productReview instanceof ProductReview);
+        assertEquals(1, validator.validate(purchaseRequestDto).size());
+        assertEquals(1, validator.validate(purchaseRequestDto2).size());
     }
 
     @Test
-    public void shouldGettersWorkAsExpected() {
-        ProductReview productReview = new ProductReview(3, "Bom produto", "Produto atende as " +
-                "expectativas", product, user);
+    public void shouldReturnErrorWhenProductIdNotSet() {
+        PurchaseRequestDto purchaseRequestDto = new PurchaseRequestDto( 20, null, PaymentGateway.PAG_SEGURO);
 
-        assertEquals(3, productReview.getGrade());
-        assertEquals("Bom produto", productReview.getTitle());
-        assertEquals("Produto atende as expectativas", productReview.getDescription());
+        assertEquals(1, validator.validate(purchaseRequestDto).size());
+    }
+
+    @Test
+    public void shouldReturnErrorWhenPaymentGatewayNotSet() {
+        PurchaseRequestDto purchaseRequestDto = new PurchaseRequestDto( 20, this.product.getId(), null);
+
+        assertEquals(1, validator.validate(purchaseRequestDto).size());
     }
 }
