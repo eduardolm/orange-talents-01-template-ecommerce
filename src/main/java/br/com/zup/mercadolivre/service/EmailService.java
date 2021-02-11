@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 @Service
+@EnableAsync
 public class EmailService implements IEmailService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductQuestionController.class);
@@ -19,6 +22,7 @@ public class EmailService implements IEmailService {
     @Autowired
     private JavaMailSender emailSender;
 
+    @Async
     public void send(String to, String from, String subject, String text) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
