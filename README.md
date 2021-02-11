@@ -24,7 +24,7 @@ De forma a evitar gastos com envio de arquivos, armazenagem e etc, nossa API uti
 
 Localstack emula alguns serviços da AWS, entre eles o S3.
 Executamos o Localstack num container docker. 
-O projeto contém o Dockerfile necessário para a execução do Localstack em um container.
+O projeto contém o docker-compose.yml necessário para a execução do Localstack em um container.
 
 Em algumas etapas do fluxo de compra do produto, a API deve enviar e-mail para o vendedor e comprador. Estes envios estão sendo feitos usando bibliotecas nativas do Spring para envio de e-mails.
 
