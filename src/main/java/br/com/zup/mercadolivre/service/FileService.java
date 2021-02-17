@@ -28,10 +28,8 @@ public class FileService {
         byte[] bytesArray = null;
 
         try {
-//            File file = new File(file);
             bytesArray = new byte[(int) file.length()];
 
-            //read file into bytes[]
             fileInputStream = new FileInputStream(file);
             fileInputStream.read(bytesArray);
 
