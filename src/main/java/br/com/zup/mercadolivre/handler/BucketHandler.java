@@ -26,8 +26,7 @@ public class BucketHandler {
         }
     }
     S3Client s3 = S3Client.builder()
-//            .endpointOverride(endpointOverride)
-
+            .endpointOverride(endpointOverride)
             .region(region)
             .build();
 
